@@ -23,7 +23,7 @@ public class ClientServer {
         TicTacToeService server = (TicTacToeService) registry
                 .lookup("TicTacToeService");
         ClientServiceImpl clientService = new ClientServiceImpl(server, username);
-        clientService.play();
+        clientService.registerPlayer();
     }
 
 }

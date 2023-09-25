@@ -10,7 +10,7 @@ public interface TicTacToeService extends Remote{
     boolean isValidMove(int row, int col)  throws RemoteException;
     boolean checkWin( int row, int col) throws RemoteException;
     boolean isBoardFull() throws RemoteException;
-    void addOnBoard(char currentPlayer, int row, int col) throws RemoteException;
+    void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException;
 
     void registerPlayer(ClientService clientService) throws RemoteException;
 }

@@ -8,9 +8,9 @@ import java.util.Scanner;
 
 public class ClientServiceImpl implements ClientService{
     private static char[][] board = new char[3][3];
-    private static char currentPlayer = 'X';
     private TicTacToeService server;
     private String username;
+    private static char symbol;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
@@ -20,36 +20,8 @@ public class ClientServiceImpl implements ClientService{
                 .exportObject( this, 0);
     }
     @Override
-    public void play() throws RemoteException {
-        /*initializeBoard();
-        boolean gameOver = false;
-
-        while (!gameOver) {
-            displayBoard();
-            int[] move = getPlayerMove();
-            int row = move[0];
-            int col = move[1];
-            System.out.println("row is "+ row+" col is "+ col);
-            if (server.isValidMove( row, col)) {
-                server.addOnBoard(currentPlayer, row, col);
-                board[row][col] = currentPlayer;
-                if (server.checkWin( row, col)) {
-                    displayBoard();
-                    System.out.println("Player " + currentPlayer + " wins!");
-                    gameOver = true;
-                } else if (server.isBoardFull()) {
-                    displayBoard();
-                    System.out.println("It's a draw!");
-                    gameOver = true;
-                } else {
-                    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
-                }
-            } else {
-                System.out.println("Invalid move. Try again.");
-            }
-        }*/
-
-        System.out.println("start playing..");
+    public void registerPlayer() throws RemoteException {
+        System.out.println("register player "+ username);
         server.registerPlayer(this);
     }
     private static void initializeBoard() {
@@ -73,7 +45,7 @@ public class ClientServiceImpl implements ClientService{
         Scanner scanner = new Scanner(System.in);
         int[] move = new int[2];
 
-        System.out.print("Player " + currentPlayer + ", enter your move (row and column): ");
+        System.out.print("Player " + symbol + ", enter your move (row and column): ");
         move[0] = scanner.nextInt();
         move[1] = scanner.nextInt();
 
@@ -85,7 +57,50 @@ public class ClientServiceImpl implements ClientService{
     }
 
     @Override
-    public void startGame(char symbol) {
+    public void startGame(char symbol, boolean isFirst) throws RemoteException {
+        this.symbol=symbol;
         System.out.println(username+ " start with "+ symbol);
+        initializeBoard();
+        if(isFirst) play();
+
+    }
+    @Override
+    public void play() throws RemoteException {
+        displayBoard();
+        int[] move = getPlayerMove();
+        int row = move[0];
+        int col = move[1];
+        System.out.println("row is "+ row+" col is "+ col);
+        if (server.isValidMove( row, col)) {
+            //TODO: if the input is invalid, we have to revert
+            board[row][col] = symbol;
+            //TODO: create a new thread
+            server.addOnBoard(this, row, col);
+
+        }
+        else {
+            System.out.println("Invalid move. Try again.");
+        }
+    }
+
+    @Override
+    public void addOnBoard(char symbolToAdd, int row, int col) throws RemoteException {
+        board[row][col] = symbolToAdd;
+    }
+
+    @Override
+    public void getResult(Result result) throws RemoteException{
+        if(result == Result.DRAW || result == Result.WIN || result == Result.FAIL){
+            displayBoard();
+            System.out.println("Player " + username + " "+ result.getResult());
+        }else if(result == Result.RETRY){
+            System.out.println("Player "+ username+" "+ ", please input a valid value!");
+            play();
+        }
+
+    }
+    @Override
+    public char getSymbol() throws RemoteException{
+        return symbol;
     }
 }

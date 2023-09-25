@@ -1,9 +1,11 @@
 package server;
 
 import client.ClientService;
+import client.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -12,10 +14,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
     private static char[][] board = new char[3][3];
-    char currentPlayer = 'X';
     LinkedBlockingQueue<ClientService> waitingPlayers = new LinkedBlockingQueue();
     ExecutorService executorService = Executors.newFixedThreadPool(10);
     List<TicTacToeGame> activeGames = new LinkedList<>();
+    HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
 
     static {
         for (int i = 0; i < 3; i++) {
@@ -39,20 +41,7 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     }
     @Override
     public boolean checkWin( int row, int col)  throws RemoteException{
-        // Check row
-        if (board[row][0] == currentPlayer && board[row][1] == currentPlayer && board[row][2] == currentPlayer) {
-            return true;
-        }
-        // Check column
-        if (board[0][col] == currentPlayer && board[1][col] == currentPlayer && board[2][col] == currentPlayer) {
-            return true;
-        }
-        // Check diagonals
-        if ((row == col || row + col == 2) &&
-                ((board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) ||
-                        (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer))) {
-            return true;
-        }
+
         return false;
     }
     @Override
@@ -67,9 +56,38 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         return true;
     }
     @Override
-    public void addOnBoard(char currentPlayer, int row, int col)  throws RemoteException{
-        board[row][col] = currentPlayer;
-        currentPlayer = currentPlayer;
+    public void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException{
+        TicTacToeGame game = playerGame.get(clientService);
+        ClientService competitor = getAnotherPlayer(game, clientService);
+        Result result = game.makeMove(row, col, clientService.getSymbol());
+        if(result == Result.WIN){
+            clientService.getResult(Result.WIN);
+            competitor.getResult(Result.FAIL);
+        }
+        else if(result == Result.DRAW ){
+            clientService.getResult(Result.DRAW);
+            competitor.getResult(Result.DRAW);
+        }
+        else if(result == Result.FAIL){
+            clientService.getResult(Result.FAIL);
+            clientService.getResult(Result.WIN);
+        }
+        else if(result == Result.CONTINUE){
+            competitor.addOnBoard(clientService.getSymbol(), row, col);
+            competitor.play();
+        }else if(result == Result.RETRY){
+            clientService.getResult(Result.RETRY);
+        }
+    }
+    private ClientService getAnotherPlayer(TicTacToeGame ticTacToeGame, ClientService player){
+        return playerGame.entrySet()
+                .stream()
+                .filter(e->e.getValue().equals(ticTacToeGame))
+                .map(e->e.getKey())
+                .filter(p-> !p.equals(player))
+                .findFirst()
+                .get();
+
     }
 
     @Override
@@ -87,6 +105,8 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 ClientService player2 = waitingPlayers.poll();
                 TicTacToeGame game = new TicTacToeGame(player1, player2);
                 activeGames.add(game);
+                playerGame.put(player1, game);
+                playerGame.put(player2, game);
                 try {
                     game.start();
                 } catch (RemoteException e) {

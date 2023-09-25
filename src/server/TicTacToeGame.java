@@ -1,6 +1,7 @@
 package server;
 
 import client.ClientService;
+import client.Result;
 
 import java.rmi.RemoteException;
 
@@ -11,7 +12,7 @@ public class TicTacToeGame {
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
-    private int currentPlayerIndex;
+    private int symbolIndex;
     private boolean gameFinished;
 
     public TicTacToeGame(ClientService player1, ClientService player2) {
@@ -19,7 +20,7 @@ public class TicTacToeGame {
         this.player2 = player2;
         this.gameId = nextGameId++;
         this.board = new char[3][3];
-        this.currentPlayerIndex = 0;
+        this.symbolIndex = 0;
     }
 
     public int getGameId() {
@@ -28,32 +29,44 @@ public class TicTacToeGame {
 
     public void start() throws RemoteException {
         System.out.println("play1 "+player1.getUsername()+ " and play2 "+player2.getUsername()+" start");
-        try {
-            //TODO: choosing symbol randomly
-            player1.startGame('X');
-            player2.startGame('O');
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        //TODO: choosing symbol randomly
+        new Thread(()-> {
+            try {
+                player1.startGame('X', true);
+            } catch (RemoteException e) {
+                //TODO: handle exception
+                throw new RuntimeException(e);
+            }
+        }).start();
+        new Thread(()->{
+            try {
+                player2.startGame('O', false);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
     }
 
-    public synchronized void makeMove(int row, int col, char symbol) {
-        if (!gameFinished && currentPlayerIndex < 2 && symbol == getPlayerSymbol(currentPlayerIndex)) {
+    public Result  makeMove(int row, int col, char symbol) {
+        if (!gameFinished ) {
             if (isValidMove(row, col)) {
                 board[row][col] = symbol;
-                notifyPlayers("Move made by Player " + (currentPlayerIndex + 1));
-                if (isWin(symbol)) {
-                    notifyPlayers("Player " + (currentPlayerIndex + 1) + " wins!");
+                if (isWin(symbol, row, col)) {
                     gameFinished = true;
+                    return Result.WIN;
                 } else if (isBoardFull()) {
-                    notifyPlayers("It's a draw!");
                     gameFinished = true;
+                    return Result.DRAW;
                 } else {
-                    currentPlayerIndex = (currentPlayerIndex + 1) % 2;
-                    notifyPlayers("Player " + (currentPlayerIndex + 1) + "'s turn.");
+                    symbolIndex = (symbolIndex + 1) % 2;
+                    return Result.CONTINUE;
                 }
             }
+            else{
+                return Result.RETRY;
+            }
         }
+        return Result.END;
     }
 
     public synchronized void quitGame(ClientService client) {
@@ -70,20 +83,29 @@ public class TicTacToeGame {
         }
     }
 
-    private char getPlayerSymbol(int index) {
-        return (index == 0) ? 'X' : 'O';
-    }
 
     private boolean isValidMove(int row, int col) {
         return row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == 0;
+
     }
 
-    private boolean isWin(char symbol) {
-        // Implement win condition logic here
-        // You need to check rows, columns, and diagonals
+    private boolean isWin(char symbol, int row, int col) {
+        // Check row
+        if (board[row][0] == symbol && board[row][1] == symbol && board[row][2] == symbol) {
+            return true;
+        }
+        // Check column
+        if (board[0][col] == symbol && board[1][col] == symbol && board[2][col] == symbol) {
+            return true;
+        }
+        // Check diagonals
+        if ((row == col || row + col == 2) &&
+                ((board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol) ||
+                        (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol))) {
+            return true;
+        }
         return false;
     }
-
     private boolean isBoardFull() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -93,16 +115,6 @@ public class TicTacToeGame {
             }
         }
         return true;
-    }
-
-    private void notifyPlayers(String message) {
-        System.out.println("notify client "+ message);
-        /*try {
-            player1.notify(message);
-            player2.notify(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public boolean isGameFinished() {
