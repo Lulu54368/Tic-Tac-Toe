@@ -1,6 +1,7 @@
 package server;
 
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,10 +18,8 @@ public class TicTacToeServer {
          portNumber = Integer.parseInt(args[1]);
          ip = args[0];
          TicTacToeService server = new TicTacToeServiceImpl();
-         TicTacToeService stub = (TicTacToeService) UnicastRemoteObject
-                 .exportObject((TicTacToeService) server, 0);
          Registry registry = LocateRegistry.createRegistry(portNumber);
-         registry.rebind("TicTacToeService", stub);
+         registry.rebind("TicTacToeService", server);
 
 
 
