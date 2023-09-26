@@ -9,19 +9,19 @@ import java.util.Scanner;
 public class ClientServiceImpl implements ClientService{
     private static char[][] board = new char[3][3];
     private TicTacToeService server;
-    private String username;
-    private static char symbol;
+    Player currentPlayer;
+    IPlayer competitor;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
         this.server = server;
-        this.username = username;
+        this.currentPlayer = new Player(username);
         UnicastRemoteObject
                 .exportObject( this, 0);
     }
     @Override
     public void registerPlayer() throws RemoteException {
-        System.out.println("register player "+ username);
+        System.out.println("register player "+ currentPlayer.getUsername());
         server.registerPlayer(this);
     }
     private static void initializeBoard() {
@@ -41,25 +41,19 @@ public class ClientServiceImpl implements ClientService{
             System.out.println("\n-------------");
         }
     }
-    private static int[] getPlayerMove() {
+    private int[] getPlayerMove() throws RemoteException {
         Scanner scanner = new Scanner(System.in);
         int[] move = new int[2];
-
-        System.out.print("Player " + symbol + ", enter your move (row and column): ");
+        System.out.print("Player " + currentPlayer.getUsername() + ", enter your move (row and column): ");
         move[0] = scanner.nextInt();
         move[1] = scanner.nextInt();
-
         return move;
     }
 
-    public String getUsername() {
-        return username;
-    }
 
     @Override
-    public void startGame(char symbol, boolean isFirst) throws RemoteException {
-        this.symbol=symbol;
-        System.out.println(username+ " start with "+ symbol);
+    public void startGame(boolean isFirst) throws RemoteException {
+        System.out.println(currentPlayer.getUsername()+ " start with "+ currentPlayer.getSymbol());
         initializeBoard();
         if(isFirst) play();
 
@@ -71,14 +65,9 @@ public class ClientServiceImpl implements ClientService{
         int row = move[0];
         int col = move[1];
         System.out.println("row is "+ row+" col is "+ col);
-        if (server.isValidMove( row, col)) {
-            //TODO: create a new thread
-            server.addOnBoard(this, row, col);
+        //TODO: create a new thread
+        server.addOnBoard(this, row, col);
 
-        }
-        else {
-            System.out.println("Invalid move. Try again.");
-        }
     }
 
     @Override
@@ -90,15 +79,26 @@ public class ClientServiceImpl implements ClientService{
     public void getResult(Result result) throws RemoteException{
         if(result == Result.DRAW || result == Result.WIN || result == Result.FAIL){
             displayBoard();
-            System.out.println("Player " + username + " "+ result.getResult());
+            System.out.println("Player " + currentPlayer.getUsername() + " "+ result.getResult());
         }else if(result == Result.RETRY){
-            System.out.println("Player "+ username+" "+ ", please input a valid value!");
+            System.out.println("Player "+ currentPlayer.getUsername()+" "+ ", please input a valid value!");
             play();
         }
 
     }
     @Override
-    public char getSymbol() throws RemoteException{
-        return symbol;
+    public IPlayer getCurrentPlayer() throws RemoteException {
+        return currentPlayer;
+    }
+    @Override
+    public void setCompetitor(IPlayer competitor) throws RemoteException{
+        this.competitor =  competitor;
+        System.out.println(this.competitor);
+    }
+
+    @Override
+    public void setTurn(IPlayer currentPlayer) throws RemoteException {
+        //set competitor's turn
+        System.out.println("Its "+ currentPlayer.getUsername()+" turn!");
     }
 }

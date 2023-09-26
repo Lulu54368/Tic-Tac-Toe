@@ -5,16 +5,13 @@ import client.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
     private static char[][] board = new char[3][3];
-    LinkedBlockingQueue<ClientService> waitingPlayers = new LinkedBlockingQueue();
+    Queue<ClientService> waitingPlayers = new LinkedList<>();
     ExecutorService executorService = Executors.newFixedThreadPool(10);
     List<TicTacToeGame> activeGames = new LinkedList<>();
     HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
@@ -27,60 +24,41 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         }
     }
 
+
+
     protected TicTacToeServiceImpl() throws RemoteException {
     }
 
-    @Override
-    public boolean isValidMove( int row, int col)  throws RemoteException {
-        System.out.println("it's "+ board[row][col]);
-        if (row < 0 || row >= 3 || col < 0 || col >= 3 || board[row][col] != ' ') {
-            return false;
-        }
 
-        return true;
-    }
-    @Override
-    public boolean checkWin( int row, int col)  throws RemoteException{
-
-        return false;
-    }
-    @Override
-    public boolean isBoardFull()  throws RemoteException{
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] == ' ') {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
     @Override
     public void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException{
         TicTacToeGame game = playerGame.get(clientService);
         ClientService competitor = getAnotherPlayer(game, clientService);
-        Result result = game.makeMove(row, col, clientService.getSymbol());
+        Result result = game.makeMove(row, col, clientService.getCurrentPlayer().getSymbol());
+        if(result != Result.RETRY && result != Result.END){
+            clientService.addOnBoard(clientService.getCurrentPlayer().getSymbol(), row, col);
+            competitor.addOnBoard(clientService.getCurrentPlayer().getSymbol(), row, col);
+        }
         if(result == Result.WIN){
-            clientService.addOnBoard(clientService.getSymbol(), row, col);
-            competitor.addOnBoard(clientService.getSymbol(), row, col);
+            Score.win(clientService.getCurrentPlayer().getUsername());
             clientService.getResult(Result.WIN);
+            Score.lose(competitor.getCurrentPlayer().getUsername());
             competitor.getResult(Result.FAIL);
         }
         else if(result == Result.DRAW ){
-            clientService.addOnBoard(clientService.getSymbol(), row, col);
-            competitor.addOnBoard(clientService.getSymbol(), row, col);
+            Score.draw(clientService.getCurrentPlayer().getUsername());
             clientService.getResult(Result.DRAW);
+            Score.draw(competitor.getCurrentPlayer().getUsername());
             competitor.getResult(Result.DRAW);
         }
         else if(result == Result.FAIL){
-            clientService.addOnBoard(clientService.getSymbol(), row, col);
-            competitor.addOnBoard(clientService.getSymbol(), row, col);
+            Score.lose(clientService.getCurrentPlayer().getUsername());
             clientService.getResult(Result.FAIL);
+            Score.win(competitor.getCurrentPlayer().getUsername());
             clientService.getResult(Result.WIN);
         }
         else if(result == Result.CONTINUE){
-            clientService.addOnBoard(clientService.getSymbol(), row, col);
-            competitor.addOnBoard(clientService.getSymbol(), row, col);
+            clientService.setTurn(competitor.getCurrentPlayer());
             competitor.play();
         }else if(result == Result.RETRY){
             clientService.getResult(Result.RETRY);
@@ -100,13 +78,24 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     @Override
     public void registerPlayer(ClientService clientService) throws RemoteException {
         //throw an exception when there are duplicate username
+
+        int rank = Score.getRank(clientService.getCurrentPlayer().getUsername());
+        clientService.getCurrentPlayer().setRank(rank);
         waitingPlayers.offer(clientService);
-        System.out.println("Player "+clientService.getUsername()+" registered.");
+        System.out.println("Player "+clientService.getCurrentPlayer().getUsername()+" registered.");
         tryMatchPlayers();
     }
 
     private void tryMatchPlayers() {
         executorService.submit(()->{
+            //TODO: assign player randomly
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                //TODO: handle exception
+                throw new RuntimeException(e);
+            }
+            Collections.shuffle((LinkedList)waitingPlayers);
             while (waitingPlayers.size() >= 2) {
                 ClientService player1 = waitingPlayers.poll();
                 ClientService player2 = waitingPlayers.poll();

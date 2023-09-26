@@ -26,11 +26,16 @@ public class TicTacToeGame {
     }
 
     public void start() throws RemoteException {
-        System.out.println("play1 "+player1.getUsername()+ " and play2 "+player2.getUsername()+" start");
+        System.out.println("play1 "+player1.getCurrentPlayer().getUsername()+
+                " and play2 "+player2.getCurrentPlayer().getUsername()+" start");
         //TODO: choosing symbol randomly
+        player1.getCurrentPlayer().setSymbol('X');
+        player2.getCurrentPlayer().setSymbol('O');
+        //player1.setCompetitor(player2.getCurrentPlayer());
+        //player2.setCompetitor(player1.getCurrentPlayer());
         new Thread(()-> {
             try {
-                player1.startGame('X', true);
+                player1.startGame(true);
             } catch (RemoteException e) {
                 //TODO: handle exception
                 throw new RuntimeException(e);
@@ -38,7 +43,7 @@ public class TicTacToeGame {
         }).start();
         new Thread(()->{
             try {
-                player2.startGame('O', false);
+                player2.startGame(false);
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
