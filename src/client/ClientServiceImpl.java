@@ -72,8 +72,6 @@ public class ClientServiceImpl implements ClientService{
         int col = move[1];
         System.out.println("row is "+ row+" col is "+ col);
         if (server.isValidMove( row, col)) {
-            //TODO: if the input is invalid, we have to revert
-            board[row][col] = symbol;
             //TODO: create a new thread
             server.addOnBoard(this, row, col);
 

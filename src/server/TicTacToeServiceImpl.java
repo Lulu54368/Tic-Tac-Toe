@@ -61,18 +61,25 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         ClientService competitor = getAnotherPlayer(game, clientService);
         Result result = game.makeMove(row, col, clientService.getSymbol());
         if(result == Result.WIN){
+            clientService.addOnBoard(clientService.getSymbol(), row, col);
+            competitor.addOnBoard(clientService.getSymbol(), row, col);
             clientService.getResult(Result.WIN);
             competitor.getResult(Result.FAIL);
         }
         else if(result == Result.DRAW ){
+            clientService.addOnBoard(clientService.getSymbol(), row, col);
+            competitor.addOnBoard(clientService.getSymbol(), row, col);
             clientService.getResult(Result.DRAW);
             competitor.getResult(Result.DRAW);
         }
         else if(result == Result.FAIL){
+            clientService.addOnBoard(clientService.getSymbol(), row, col);
+            competitor.addOnBoard(clientService.getSymbol(), row, col);
             clientService.getResult(Result.FAIL);
             clientService.getResult(Result.WIN);
         }
         else if(result == Result.CONTINUE){
+            clientService.addOnBoard(clientService.getSymbol(), row, col);
             competitor.addOnBoard(clientService.getSymbol(), row, col);
             competitor.play();
         }else if(result == Result.RETRY){
@@ -94,7 +101,7 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     public void registerPlayer(ClientService clientService) throws RemoteException {
         //throw an exception when there are duplicate username
         waitingPlayers.offer(clientService);
-        System.out.println("Player registered.");
+        System.out.println("Player "+clientService.getUsername()+" registered.");
         tryMatchPlayers();
     }
 

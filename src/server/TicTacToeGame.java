@@ -12,7 +12,6 @@ public class TicTacToeGame {
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
-    private int symbolIndex;
     private boolean gameFinished;
 
     public TicTacToeGame(ClientService player1, ClientService player2) {
@@ -20,7 +19,6 @@ public class TicTacToeGame {
         this.player2 = player2;
         this.gameId = nextGameId++;
         this.board = new char[3][3];
-        this.symbolIndex = 0;
     }
 
     public int getGameId() {
@@ -58,7 +56,6 @@ public class TicTacToeGame {
                     gameFinished = true;
                     return Result.DRAW;
                 } else {
-                    symbolIndex = (symbolIndex + 1) % 2;
                     return Result.CONTINUE;
                 }
             }
