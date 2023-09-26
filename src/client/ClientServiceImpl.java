@@ -100,5 +100,6 @@ public class ClientServiceImpl implements ClientService{
     public void setTurn(IPlayer currentPlayer) throws RemoteException {
         //set competitor's turn
         System.out.println("Its "+ currentPlayer.getUsername()+" turn!");
+        System.out.println("ranking "+ currentPlayer.getRank());
     }
 }

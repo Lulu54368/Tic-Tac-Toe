@@ -1,16 +1,17 @@
 package server;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Score {
-    private static Map<String, Integer> scoreMap = new HashMap<>();
+    private static Map<String, Integer> scoreMap = new LinkedHashMap<>();
     public static void createNew(String username){
         scoreMap.putIfAbsent(username, 0);
     }
     public static void win(String username){
-        scoreMap.put(username, scoreMap.get(username)+5);
+        scoreMap.put(username, scoreMap.getOrDefault(username, 0)+5);
     }
     public static void lose(String username){
         scoreMap.put(username, Math.max(scoreMap.get(username)-5, 0));
@@ -24,7 +25,6 @@ public class Score {
                 .stream()
                 .sorted((Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) ->
                         o2.getValue()-o1.getValue()
-
                 )
                 .map(e->e.getKey())
                 .collect(Collectors.toList())

@@ -78,7 +78,7 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     @Override
     public void registerPlayer(ClientService clientService) throws RemoteException {
         //throw an exception when there are duplicate username
-
+        Score.createNew(clientService.getCurrentPlayer().getUsername());
         int rank = Score.getRank(clientService.getCurrentPlayer().getUsername());
         clientService.getCurrentPlayer().setRank(rank);
         waitingPlayers.offer(clientService);

@@ -13,4 +13,5 @@ public interface IPlayer extends Remote {
 
     String getUsername() throws RemoteException;
 
+    int getRank() throws RemoteException;
 }

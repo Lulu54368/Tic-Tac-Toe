@@ -23,9 +23,7 @@ public class Player implements IPlayer, Serializable {
         this.symbol = symbol;
     }
 
-    public int getRank() {
-        return rank;
-    }
+
     @Override
     public void setRank(int rank) throws RemoteException{
         this.rank = rank;
@@ -33,6 +31,11 @@ public class Player implements IPlayer, Serializable {
     @Override
     public String getUsername() throws RemoteException{
         return username;
+    }
+
+    @Override
+    public int getRank() throws RemoteException {
+        return rank;
     }
 
 
