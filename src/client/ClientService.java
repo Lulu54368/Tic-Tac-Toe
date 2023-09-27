@@ -1,5 +1,8 @@
 package client;
 
+import server.IPlayer;
+import server.MessageBroker;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -15,7 +18,9 @@ public interface ClientService extends Remote {
     IPlayer getCurrentPlayer() throws RemoteException;
 
 
-    void setCompetitor(IPlayer competitor) throws RemoteException;
-
     void setTurn(IPlayer currentPlayer) throws RemoteException;
+
+    void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
+
+    void updateMessage() throws RemoteException;
 }

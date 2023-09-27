@@ -1,5 +1,8 @@
 package client;
 
+import server.IPlayer;
+import server.MessageBroker;
+import server.Player;
 import server.TicTacToeService;
 
 import java.rmi.RemoteException;
@@ -10,7 +13,7 @@ public class ClientServiceImpl implements ClientService{
     private static char[][] board = new char[3][3];
     private TicTacToeService server;
     Player currentPlayer;
-    IPlayer competitor;
+    MessageBroker messageBroker;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
@@ -60,6 +63,7 @@ public class ClientServiceImpl implements ClientService{
     }
     @Override
     public void play() throws RemoteException {
+        //messageBroker.sendMessage(currentPlayer, "hello word "+ currentPlayer.getUsername());
         displayBoard();
         int[] move = getPlayerMove();
         int row = move[0];
@@ -67,6 +71,7 @@ public class ClientServiceImpl implements ClientService{
         System.out.println("row is "+ row+" col is "+ col);
         //TODO: create a new thread
         server.addOnBoard(this, row, col);
+
 
     }
 
@@ -90,16 +95,20 @@ public class ClientServiceImpl implements ClientService{
     public IPlayer getCurrentPlayer() throws RemoteException {
         return currentPlayer;
     }
-    @Override
-    public void setCompetitor(IPlayer competitor) throws RemoteException{
-        this.competitor =  competitor;
-        System.out.println(this.competitor);
-    }
 
     @Override
     public void setTurn(IPlayer currentPlayer) throws RemoteException {
         //set competitor's turn
         System.out.println("Its "+ currentPlayer.getUsername()+" turn!");
         System.out.println("ranking "+ currentPlayer.getRank());
+    }
+    @Override
+    public void setMessageBroker(MessageBroker messageBroker) throws RemoteException{
+        this.messageBroker = messageBroker;
+    }
+
+    @Override
+    public void updateMessage() throws RemoteException {
+        System.out.println(messageBroker.getMessageQueue());
     }
 }

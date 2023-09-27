@@ -11,10 +11,10 @@ import java.util.concurrent.Executors;
 
 public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
     private static char[][] board = new char[3][3];
-    Queue<ClientService> waitingPlayers = new LinkedList<>();
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
-    List<TicTacToeGame> activeGames = new LinkedList<>();
-    HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
+    private static Queue<ClientService> waitingPlayers = new LinkedList<>();
+    private static ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private static List<TicTacToeGame> activeGames = new LinkedList<>();
+    private static HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
 
     static {
         for (int i = 0; i < 3; i++) {

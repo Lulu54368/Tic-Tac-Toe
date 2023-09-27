@@ -3,9 +3,10 @@ package server;
 import client.ClientService;
 import client.Result;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
-public class TicTacToeGame {
+public class TicTacToeGame implements Serializable {
     private static int nextGameId = 1;
 
     private int gameId;
@@ -31,8 +32,9 @@ public class TicTacToeGame {
         //TODO: choosing symbol randomly
         player1.getCurrentPlayer().setSymbol('X');
         player2.getCurrentPlayer().setSymbol('O');
-        //player1.setCompetitor(player2.getCurrentPlayer());
-        //player2.setCompetitor(player1.getCurrentPlayer());
+        MessageBroker messageBroker = new MessageBrokerImpl(this);
+        player1.setMessageBroker(messageBroker);
+        player2.setMessageBroker(messageBroker);
         new Thread(()-> {
             try {
                 player1.startGame(true);
@@ -121,6 +123,11 @@ public class TicTacToeGame {
 
     public boolean isGameFinished() {
         return gameFinished;
+    }
+
+    public void updateMessage() throws RemoteException {
+        player1.updateMessage();
+        player2.updateMessage();
     }
 }
 

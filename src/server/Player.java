@@ -1,4 +1,6 @@
-package client;
+package server;
+
+import server.IPlayer;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
