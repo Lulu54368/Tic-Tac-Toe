@@ -59,11 +59,16 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         }
         else if(result == Result.CONTINUE){
             clientService.setTurn(competitor.getCurrentPlayer());
+            new TicTacToeGame.Counter(competitor).count();
             competitor.play();
+
         }else if(result == Result.RETRY){
             clientService.getResult(Result.RETRY);
+            new TicTacToeGame.Counter(competitor).count();
         }
     }
+
+
     private ClientService getAnotherPlayer(TicTacToeGame ticTacToeGame, ClientService player){
         return playerGame.entrySet()
                 .stream()

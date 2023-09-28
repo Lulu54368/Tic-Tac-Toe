@@ -116,6 +116,6 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void sendTime(int time) throws RemoteException {
-        System.out.println("timer is "+ time);
+        //System.out.println("timer is "+ time);
     }
 }

@@ -14,23 +14,20 @@ public class TicTacToeGame implements Serializable {
     private char[][] board;
     private boolean gameFinished;
 
-    public class Counter extends TimerTask{
-        TicTacToeGame ticTacToeGame;
+    public static class Counter extends TimerTask{
 
-        int time = 3;//TODO: set proper timer
+        int time = 20;
+        ClientService currentPlayer;
 
-        public Counter(TicTacToeGame ticTacToeGame) {
-            this.ticTacToeGame = ticTacToeGame;
+        public Counter(ClientService currentPlayer) {
+            this.currentPlayer = currentPlayer;
         }
 
         @Override
         public void run() {
-            if(time == 0 && !isGameFinished()){
-                gameFinished = true;
+            if(time == 0 ){
                 try {
-                    player1.getResult(Result.END);
-                    player2.getResult(Result.END);
-                    TicTacToeServiceImpl.endGame(ticTacToeGame);
+                    currentPlayer.getResult(Result.CONTINUE);
                     cancel();
                     return;
                 } catch (RemoteException e) {
@@ -40,8 +37,7 @@ public class TicTacToeGame implements Serializable {
             }
             if(time > 0){
                 try {
-                    player1.sendTime(time);
-                    player2.sendTime(time);
+                    currentPlayer.sendTime(time);
                 } catch (RemoteException e) {
                     //TODO: handle exception
                     throw new RuntimeException(e);
@@ -50,6 +46,11 @@ public class TicTacToeGame implements Serializable {
             }
 
 
+        }
+        public void count(){
+            TimerTask timerTask = this;
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(timerTask, 0, 1000L);
         }
     }
 
@@ -85,9 +86,7 @@ public class TicTacToeGame implements Serializable {
             }
         }).start();
 
-        TimerTask timerTask = new Counter(this);
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 60*1000L);
+
     }
 
     public Result  makeMove(int row, int col, char symbol) {
