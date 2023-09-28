@@ -63,7 +63,6 @@ public class ClientServiceImpl implements ClientService{
     }
     @Override
     public void play() throws RemoteException {
-        //messageBroker.sendMessage(currentPlayer, "hello word "+ currentPlayer.getUsername());
         displayBoard();
         int[] move = getPlayerMove();
         int row = move[0];
@@ -89,6 +88,9 @@ public class ClientServiceImpl implements ClientService{
             System.out.println("Player "+ currentPlayer.getUsername()+" "+ ", please input a valid value!");
             play();
         }
+        else if(result == Result.END){
+            System.out.println("The play end!");
+        }
 
     }
     @Override
@@ -110,5 +112,10 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void updateMessage() throws RemoteException {
         System.out.println(messageBroker.getMessageQueue());
+    }
+
+    @Override
+    public void sendTime(int time) throws RemoteException {
+        System.out.println("timer is "+ time);
     }
 }

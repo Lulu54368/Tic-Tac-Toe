@@ -5,11 +5,10 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TicTacToeGame implements Serializable {
-    private static int nextGameId = 1;
-
-    private int gameId;
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
@@ -18,12 +17,7 @@ public class TicTacToeGame implements Serializable {
     public TicTacToeGame(ClientService player1, ClientService player2) {
         this.player1 = player1;
         this.player2 = player2;
-        this.gameId = nextGameId++;
         this.board = new char[3][3];
-    }
-
-    public int getGameId() {
-        return gameId;
     }
 
     public void start() throws RemoteException {
@@ -35,6 +29,7 @@ public class TicTacToeGame implements Serializable {
         MessageBroker messageBroker = new MessageBrokerImpl(this);
         player1.setMessageBroker(messageBroker);
         player2.setMessageBroker(messageBroker);
+        gameFinished = false;
         new Thread(()-> {
             try {
                 player1.startGame(true);
@@ -50,6 +45,36 @@ public class TicTacToeGame implements Serializable {
                 throw new RuntimeException(e);
             }
         }).start();
+
+        TimerTask timerTask = new TimerTask() {
+            int time = 5; //TODO: set proper timer
+            @Override
+            public void run() {
+                if(time > 0){
+                    try {
+                        player1.sendTime(time);
+                        player2.sendTime(time);
+                    } catch (RemoteException e) {
+                        //TODO: handle exception
+                        throw new RuntimeException(e);
+                    }
+                    time--;
+                }
+                if(time == 0 && !isGameFinished()){
+                    gameFinished = true;
+                    try {
+                        player1.getResult(Result.END);
+                        player2.getResult(Result.END);
+                    } catch (RemoteException e) {
+                        //TODO: handle exception
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+        };
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(timerTask, 0, 60*1000L);
     }
 
     public Result  makeMove(int row, int col, char symbol) {

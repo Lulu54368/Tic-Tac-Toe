@@ -75,6 +75,13 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
 
     }
 
+    private static void removeClientServiceByGame(TicTacToeGame game){
+        playerGame.entrySet()
+                .stream()
+                .filter(e->e.getValue().equals(game))
+                .map(e->playerGame.remove(e.getKey(), game));
+    }
+
     @Override
     public void registerPlayer(ClientService clientService) throws RemoteException {
         //throw an exception when there are duplicate username
@@ -113,4 +120,10 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         });
 
     }
+
+    public static void endGame(TicTacToeGame game){
+        activeGames.remove(game);
+        removeClientServiceByGame(game);
+    }
+
 }

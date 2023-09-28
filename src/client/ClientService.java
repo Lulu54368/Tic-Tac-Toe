@@ -23,4 +23,6 @@ public interface ClientService extends Remote {
     void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
 
     void updateMessage() throws RemoteException;
+
+    void sendTime(int time) throws RemoteException;
 }
