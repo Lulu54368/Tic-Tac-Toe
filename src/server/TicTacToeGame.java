@@ -14,6 +14,45 @@ public class TicTacToeGame implements Serializable {
     private char[][] board;
     private boolean gameFinished;
 
+    public class Counter extends TimerTask{
+        TicTacToeGame ticTacToeGame;
+
+        int time = 3;//TODO: set proper timer
+
+        public Counter(TicTacToeGame ticTacToeGame) {
+            this.ticTacToeGame = ticTacToeGame;
+        }
+
+        @Override
+        public void run() {
+            if(time == 0 && !isGameFinished()){
+                gameFinished = true;
+                try {
+                    player1.getResult(Result.END);
+                    player2.getResult(Result.END);
+                    TicTacToeServiceImpl.endGame(ticTacToeGame);
+                    cancel();
+                    return;
+                } catch (RemoteException e) {
+                    //TODO: handle exception
+                    throw new RuntimeException(e);
+                }
+            }
+            if(time > 0){
+                try {
+                    player1.sendTime(time);
+                    player2.sendTime(time);
+                } catch (RemoteException e) {
+                    //TODO: handle exception
+                    throw new RuntimeException(e);
+                }
+                time--;
+            }
+
+
+        }
+    }
+
     public TicTacToeGame(ClientService player1, ClientService player2) {
         this.player1 = player1;
         this.player2 = player2;
@@ -46,33 +85,7 @@ public class TicTacToeGame implements Serializable {
             }
         }).start();
 
-        TimerTask timerTask = new TimerTask() {
-            int time = 5; //TODO: set proper timer
-            @Override
-            public void run() {
-                if(time > 0){
-                    try {
-                        player1.sendTime(time);
-                        player2.sendTime(time);
-                    } catch (RemoteException e) {
-                        //TODO: handle exception
-                        throw new RuntimeException(e);
-                    }
-                    time--;
-                }
-                if(time == 0 && !isGameFinished()){
-                    gameFinished = true;
-                    try {
-                        player1.getResult(Result.END);
-                        player2.getResult(Result.END);
-                    } catch (RemoteException e) {
-                        //TODO: handle exception
-                        throw new RuntimeException(e);
-                    }
-                }
-
-            }
-        };
+        TimerTask timerTask = new Counter(this);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(timerTask, 0, 60*1000L);
     }
