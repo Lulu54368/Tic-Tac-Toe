@@ -16,7 +16,6 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     private static Queue<ClientService> waitingPlayers = new LinkedList<>();
     private static ExecutorService executorService = Executors.newFixedThreadPool(10);
     private static List<TicTacToeGame> activeGames = new LinkedList<>();
-    private static TicTacToeService ticTacToeService;
 
 
     static {
@@ -119,6 +118,10 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         });
 
     }
+    @Override
+     public String pong() throws RemoteException{
+        return "OK";
+     }
 
     public static void endGame(TicTacToeGame game){
         activeGames.remove(game);

@@ -11,4 +11,6 @@ public interface TicTacToeService extends Remote{
 
     void registerPlayer(ClientService clientService) throws RemoteException;
 
+    String pong() throws RemoteException;
+
 }

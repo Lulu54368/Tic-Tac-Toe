@@ -11,13 +11,32 @@ public class ClientServiceImpl implements ClientService{
     private TicTacToeService server;
     Player currentPlayer;
     MessageBroker messageBroker;
+    class HeartBeat extends Thread{
+        @Override
+        public void run(){
+            try{
+                while(true){
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                System.exit(0);
+            }
+        }
+    }
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
         this.server = server;
         this.currentPlayer = new Player(username);
+        new HeartBeat().start();
         UnicastRemoteObject
                 .exportObject( this, 0);
+
     }
     @Override
     public void registerPlayer() throws RemoteException {
@@ -113,4 +132,6 @@ public class ClientServiceImpl implements ClientService{
     public void sendTime(int time) throws RemoteException {
         System.out.println("timer is "+ time);
     }
+
+
 }
