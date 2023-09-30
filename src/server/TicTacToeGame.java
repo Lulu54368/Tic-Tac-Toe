@@ -5,8 +5,6 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class TicTacToeGame implements Serializable {
     private ClientService player1;
@@ -14,45 +12,8 @@ public class TicTacToeGame implements Serializable {
     private char[][] board;
     private boolean gameFinished;
 
-    public static class Counter extends TimerTask{
-
-        int time = 20;
-        ClientService currentPlayer;
-
-        public Counter(ClientService currentPlayer) {
-            this.currentPlayer = currentPlayer;
-        }
-
-        @Override
-        public void run() {
-            if(time == 0 ){
-                try {
-                    currentPlayer.getResult(Result.CONTINUE);
-                    cancel();
-                    return;
-                } catch (RemoteException e) {
-                    //TODO: handle exception
-                    throw new RuntimeException(e);
-                }
-            }
-            if(time > 0){
-                try {
-                    currentPlayer.sendTime(time);
-                } catch (RemoteException e) {
-                    //TODO: handle exception
-                    throw new RuntimeException(e);
-                }
-                time--;
-            }
 
 
-        }
-        public void count(){
-            TimerTask timerTask = this;
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(timerTask, 0, 1000L);
-        }
-    }
 
     public TicTacToeGame(ClientService player1, ClientService player2) {
         this.player1 = player1;
@@ -72,6 +33,7 @@ public class TicTacToeGame implements Serializable {
         gameFinished = false;
         new Thread(()-> {
             try {
+                new Counter(player1).count();
                 player1.startGame(true);
             } catch (RemoteException e) {
                 //TODO: handle exception
@@ -85,6 +47,7 @@ public class TicTacToeGame implements Serializable {
                 throw new RuntimeException(e);
             }
         }).start();
+
 
 
     }

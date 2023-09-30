@@ -9,12 +9,15 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static server.PlayerGames.*;
+
 public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
     private static char[][] board = new char[3][3];
     private static Queue<ClientService> waitingPlayers = new LinkedList<>();
     private static ExecutorService executorService = Executors.newFixedThreadPool(10);
     private static List<TicTacToeGame> activeGames = new LinkedList<>();
-    private static HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
+    private static TicTacToeService ticTacToeService;
+
 
     static {
         for (int i = 0; i < 3; i++) {
@@ -26,13 +29,15 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
 
 
 
-    protected TicTacToeServiceImpl() throws RemoteException {
+    public TicTacToeServiceImpl() throws RemoteException {
+        super();
     }
+
 
 
     @Override
     public void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException{
-        TicTacToeGame game = playerGame.get(clientService);
+        TicTacToeGame game = PlayerGames.getGameByPlayer(clientService);
         ClientService competitor = getAnotherPlayer(game, clientService);
         Result result = game.makeMove(row, col, clientService.getCurrentPlayer().getSymbol());
         if(result != Result.RETRY && result != Result.END){
@@ -58,34 +63,23 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
             clientService.getResult(Result.WIN);
         }
         else if(result == Result.CONTINUE){
-            clientService.setTurn(competitor.getCurrentPlayer());
-            new TicTacToeGame.Counter(competitor).count();
-            competitor.play();
-
+            switchTurn( clientService);
         }else if(result == Result.RETRY){
             clientService.getResult(Result.RETRY);
-            new TicTacToeGame.Counter(competitor).count();
+            new Counter(competitor).count();
         }
     }
-
-
-    private ClientService getAnotherPlayer(TicTacToeGame ticTacToeGame, ClientService player){
-        return playerGame.entrySet()
-                .stream()
-                .filter(e->e.getValue().equals(ticTacToeGame))
-                .map(e->e.getKey())
-                .filter(p-> !p.equals(player))
-                .findFirst()
-                .get();
-
+    public  static void switchTurn( ClientService player) throws RemoteException {
+        TicTacToeGame ticTacToeGame = getGameByPlayer(player);
+        ClientService competitor = getAnotherPlayer(ticTacToeGame, player);
+        player.setTurn(competitor.getCurrentPlayer());
+        new Counter(competitor).count();
+        competitor.play();
     }
 
-    private static void removeClientServiceByGame(TicTacToeGame game){
-        playerGame.entrySet()
-                .stream()
-                .filter(e->e.getValue().equals(game))
-                .map(e->playerGame.remove(e.getKey(), game));
-    }
+
+
+
 
     @Override
     public void registerPlayer(ClientService clientService) throws RemoteException {
@@ -113,8 +107,8 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 ClientService player2 = waitingPlayers.poll();
                 TicTacToeGame game = new TicTacToeGame(player1, player2);
                 activeGames.add(game);
-                playerGame.put(player1, game);
-                playerGame.put(player2, game);
+                putClientGameEntry(game, player1);
+                putClientGameEntry(game, player2);
                 try {
                     game.start();
                 } catch (RemoteException e) {

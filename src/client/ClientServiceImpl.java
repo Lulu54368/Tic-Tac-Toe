@@ -1,9 +1,6 @@
 package client;
 
-import server.IPlayer;
-import server.MessageBroker;
-import server.Player;
-import server.TicTacToeService;
+import server.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -70,8 +67,6 @@ public class ClientServiceImpl implements ClientService{
         System.out.println("row is "+ row+" col is "+ col);
         //TODO: create a new thread
         server.addOnBoard(this, row, col);
-
-
     }
 
     @Override
@@ -116,6 +111,6 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void sendTime(int time) throws RemoteException {
-        //System.out.println("timer is "+ time);
+        System.out.println("timer is "+ time);
     }
 }
