@@ -9,6 +9,8 @@ import java.rmi.RemoteException;
 public interface TicTacToeService extends Remote{
     void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException;
 
+    void switchTurn(ClientService player) throws RemoteException;
+
     void registerPlayer(ClientService clientService) throws RemoteException;
 
     String pong() throws RemoteException;

@@ -1,35 +1,35 @@
-package server;
+package client;
 
-import client.ClientService;
+import server.TicTacToeService;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static server.TicTacToeServiceImpl.switchTurn;
-
 public class Counter extends TimerTask implements  Serializable {
 
     int time = 20;
     ClientService currentPlayer;
+    TicTacToeService ticTacToeService;
+    Timer timer = new Timer();
 
-    public Counter(ClientService currentPlayer) {
+    public Counter(ClientService currentPlayer, TicTacToeService ticTacToeService) {
         this.currentPlayer = currentPlayer;
+        this.ticTacToeService = ticTacToeService;
     }
 
     @Override
     public void run() {
         if(time == 0 ){
+            System.out.println("time out!");
             try {
-                System.out.println("time out!");
-                switchTurn(currentPlayer);
-                cancel();
-                return;
+                ticTacToeService.switchTurn(currentPlayer);
             } catch (RemoteException e) {
-                //TODO: handle exception
                 throw new RuntimeException(e);
             }
+            cancel();
+            return;
         }
         if(time > 0){
             try {
@@ -46,7 +46,10 @@ public class Counter extends TimerTask implements  Serializable {
 
     public void count() {
         TimerTask timerTask = this;
-        Timer timer = new Timer();
         timer.scheduleAtFixedRate(timerTask, 0, 1000L);
+    }
+    public boolean cancel(){
+        timer.cancel();
+        return true;
     }
 }

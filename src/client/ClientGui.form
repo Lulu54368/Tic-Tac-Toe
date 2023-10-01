@@ -53,7 +53,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="cc2e7" class="javax.swing.JButton" binding="button3" default-binding="true">
+          <component id="cc2e7" class="javax.swing.JButton" binding="button4">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -61,7 +61,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="d8b7f" class="javax.swing.JButton" binding="button4" default-binding="true">
+          <component id="d8b7f" class="javax.swing.JButton" binding="button5">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -69,7 +69,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="524be" class="javax.swing.JButton" binding="button5" default-binding="true">
+          <component id="524be" class="javax.swing.JButton" binding="button3">
             <constraints>
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>

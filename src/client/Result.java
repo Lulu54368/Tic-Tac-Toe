@@ -1,10 +1,11 @@
 package client;
 
-public enum Result {
+import java.io.Serializable;
+
+public enum Result implements Serializable {
 
     WIN("wins"),
     DRAW("draw"),
-    FAIL("fails"),
     CONTINUE("continue"),
     END("end"),
     RETRY("retry");
@@ -12,7 +13,5 @@ public enum Result {
     Result(String result) {
         this.result = result;
     }
-    public String getResult(){
-        return result;
-    }
+
 }

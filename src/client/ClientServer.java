@@ -1,6 +1,5 @@
 package client;
 
-import server.Score;
 import server.TicTacToeService;
 
 import java.rmi.NotBoundException;

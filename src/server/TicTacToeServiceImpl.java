@@ -45,9 +45,21 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         }
         if(result == Result.WIN){
             Score.win(clientService.getCurrentPlayer().getUsername());
-            clientService.getResult(Result.WIN);
+            new Thread(()-> {
+                try {
+                    clientService.getResult(result, clientService.getCurrentPlayer().getUsername());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
             Score.lose(competitor.getCurrentPlayer().getUsername());
-            competitor.getResult(Result.FAIL);
+            new Thread(()-> {
+                try {
+                    competitor.getResult(result, clientService.getCurrentPlayer().getUsername());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
         }
         else if(result == Result.DRAW ){
             Score.draw(clientService.getCurrentPlayer().getUsername());
@@ -55,30 +67,19 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
             Score.draw(competitor.getCurrentPlayer().getUsername());
             competitor.getResult(Result.DRAW);
         }
-        else if(result == Result.FAIL){
-            Score.lose(clientService.getCurrentPlayer().getUsername());
-            clientService.getResult(Result.FAIL);
-            Score.win(competitor.getCurrentPlayer().getUsername());
-            clientService.getResult(Result.WIN);
-        }
         else if(result == Result.CONTINUE){
             switchTurn( clientService);
         }else if(result == Result.RETRY){
             clientService.getResult(Result.RETRY);
-            new Counter(competitor).count();
         }
     }
-    public  static void switchTurn( ClientService player) throws RemoteException {
+    @Override
+    public  void switchTurn( ClientService player) throws RemoteException {
         TicTacToeGame ticTacToeGame = getGameByPlayer(player);
         ClientService competitor = getAnotherPlayer(ticTacToeGame, player);
         player.setTurn(competitor.getCurrentPlayer());
-        new Counter(competitor).count();
         competitor.play();
     }
-
-
-
-
 
     @Override
     public void registerPlayer(ClientService clientService) throws RemoteException {
@@ -108,12 +109,10 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 try {
                     game = new TicTacToeGame(player1, player2);
                 } catch (RemoteException e) {
-                    //TODO: add exception handler
+                    //TODO: handle exception
                     throw new RuntimeException(e);
                 }
                 activeGames.add(game);
-                putClientGameEntry(game, player1);
-                putClientGameEntry(game, player2);
                 try {
                     game.start();
                 } catch (RemoteException e) {

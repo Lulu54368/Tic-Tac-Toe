@@ -5,20 +5,31 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Queue;
+import static server.PlayerGames.putClientGameEntry;
 
-public class TicTacToeGame implements Serializable {
+public class TicTacToeGame implements Serializable, ITicTacToeGame {
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
     private boolean gameFinished;
+    private MessageBroker messageBroker;
 
 
 
 
-    public TicTacToeGame(ClientService player1, ClientService player2) {
+    public TicTacToeGame(ClientService player1, ClientService player2) throws RemoteException {
         this.player1 = player1;
         this.player2 = player2;
         this.board = new char[3][3];
+        MessageBroker messageBroker = new MessageBrokerImpl();
+        this.messageBroker = messageBroker;
+        putClientGameEntry(this, player1);
+        putClientGameEntry(this, player2);
+        player1.setGame(this);
+        player2.setGame(this);
+        System.out.println("game in both player" +String.valueOf(player1.getGame() == player2.getGame()));
     }
 
     public void start() throws RemoteException {
@@ -27,13 +38,9 @@ public class TicTacToeGame implements Serializable {
         //TODO: choosing symbol randomly
         player1.getCurrentPlayer().setSymbol('X');
         player2.getCurrentPlayer().setSymbol('O');
-        MessageBroker messageBroker = new MessageBrokerImpl(this);
-        player1.setMessageBroker(messageBroker);
-        player2.setMessageBroker(messageBroker);
         gameFinished = false;
         new Thread(()-> {
             try {
-                new Counter(player1).count();
                 player1.startGame(true);
             } catch (RemoteException e) {
                 //TODO: handle exception
@@ -47,9 +54,6 @@ public class TicTacToeGame implements Serializable {
                 throw new RuntimeException(e);
             }
         }).start();
-
-
-
     }
 
     public Result  makeMove(int row, int col, char symbol) {
@@ -124,10 +128,17 @@ public class TicTacToeGame implements Serializable {
     public boolean isGameFinished() {
         return gameFinished;
     }
-
-    public void updateMessage() throws RemoteException {
+    @Override
+    public void updateMessage(IPlayer iPlayer, String message) throws RemoteException {
+        messageBroker.sendMessage(iPlayer, message);
+        //TODO: two players should refer to the same game object
         player1.updateMessage();
         player2.updateMessage();
+    }
+
+    @Override
+    public Queue<Map<IPlayer, String>> getMessage() throws RemoteException {
+        return messageBroker.getMessageQueue();
     }
 }
 

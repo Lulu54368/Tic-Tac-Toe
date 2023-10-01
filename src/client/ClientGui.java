@@ -1,12 +1,12 @@
 package client;
 
 import server.IPlayer;
-import server.MessageBroker;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -17,9 +17,9 @@ public class ClientGui extends JFrame{
     private JTextPane playerchat;
     private JButton button1;
     private JButton button2;
-    private JButton button3;
     private JButton button4;
     private JButton button5;
+    private JButton button3;
     private JButton button6;
     private JButton button7;
     private JButton button8;
@@ -31,9 +31,13 @@ public class ClientGui extends JFrame{
     private JButton sendButton;
     private static ClientGui clientGui;
     private ClientService clientService;
+    private char symbol;
+    private boolean isenabled = false;
+    private List<JButton> jButtons= Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
 
     private ClientGui(ClientService clientService){
         initialiseGUI();
+        disableButton();
         this.clientService = clientService;
     }
     public static ClientGui getClientGUI(ClientService clientService){
@@ -44,7 +48,7 @@ public class ClientGui extends JFrame{
     }
     private void initialiseGUI() {
         setContentPane(clientPanel);
-        setTitle("Dictionary Client GUI");
+        setTitle("Tic-Tac-Toe Client GUI");
         setSize(640, 200);
         setLocationRelativeTo(null);
         setVisible(true);
@@ -74,7 +78,41 @@ public class ClientGui extends JFrame{
                 }
             }
         });
+
+        jButtons.stream().forEach(jButton -> {
+            jButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int row = jButtons.indexOf(jButton)/3;
+                    int col = jButtons.indexOf(jButton)%3;
+                    try {
+                        disableButton();
+                        clientService.play(row, col);
+                    } catch (RemoteException ex) {
+                        //TODO: handle exception
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
+        });
     }
+    public void disableButton(){
+        isenabled = false;
+        jButtons.stream().forEach(jButton -> {
+            jButton.setEnabled(false);
+        });
+    }
+    public void play(){
+        enableButton();
+    }
+
+    private void enableButton(){
+        isenabled = true;
+        jButtons.stream().forEach(jButton -> {
+            jButton.setEnabled(true);
+        });
+    }
+
 
     public void showTime(int time) {
         timer.setText("Timer\n"+ time);
@@ -99,7 +137,21 @@ public class ClientGui extends JFrame{
         playerchat.setText(chat);
     }
 
+    public void addOnBoard(char symbol, int index){
+        jButtons.get(index)
+                .setText(String.valueOf(symbol));
+    }
+    public void erase(){
+        timer.setText("");
+    }
 
 
+    public void showResult(String result) {
+        if(result == Result.DRAW.result){
+            JOptionPane.showMessageDialog(ClientGui.this, result);
+        }else{
+            JOptionPane.showMessageDialog(ClientGui.this, result+" win!");
+        }
 
+    }
 }
