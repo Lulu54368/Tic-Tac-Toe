@@ -25,4 +25,6 @@ public interface ClientService extends Remote {
     void updateMessage() throws RemoteException;
 
     void sendTime(int time) throws RemoteException;
+
+    void sendMessage(String message) throws RemoteException;
 }

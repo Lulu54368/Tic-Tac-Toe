@@ -6,6 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
+import static client.ClientGui.getClientGUI;
+
 public class ClientServiceImpl implements ClientService{
     private static char[][] board = new char[3][3];
     private TicTacToeService server;
@@ -125,12 +127,16 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void updateMessage() throws RemoteException {
-        System.out.println(messageBroker.getMessageQueue());
+        getClientGUI(this).showMessage(messageBroker.getMessageQueue());
     }
 
     @Override
     public void sendTime(int time) throws RemoteException {
-        System.out.println("timer is "+ time);
+        getClientGUI(this).showTime(time);
+    }
+    @Override
+    public void sendMessage(String message) throws RemoteException {
+        .sendMessage(currentPlayer, message);
     }
 
 

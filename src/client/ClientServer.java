@@ -1,11 +1,14 @@
 package client;
 
+import server.Score;
 import server.TicTacToeService;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
+import static client.ClientGui.getClientGUI;
 
 public class ClientServer {
     private static Integer portNumber;
@@ -24,6 +27,7 @@ public class ClientServer {
                 .lookup("TicTacToeService");
         ClientServiceImpl clientService = new ClientServiceImpl(server, username);
         clientService.registerPlayer();
+        getClientGUI(clientService).startGame(username, clientService.currentPlayer.getRank());
     }
 
 }

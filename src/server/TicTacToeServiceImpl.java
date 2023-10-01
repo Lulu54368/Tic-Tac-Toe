@@ -104,7 +104,13 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
             while (waitingPlayers.size() >= 2) {
                 ClientService player1 = waitingPlayers.poll();
                 ClientService player2 = waitingPlayers.poll();
-                TicTacToeGame game = new TicTacToeGame(player1, player2);
+                TicTacToeGame game = null;
+                try {
+                    game = new TicTacToeGame(player1, player2);
+                } catch (RemoteException e) {
+                    //TODO: add exception handler
+                    throw new RuntimeException(e);
+                }
                 activeGames.add(game);
                 putClientGameEntry(game, player1);
                 putClientGameEntry(game, player2);
