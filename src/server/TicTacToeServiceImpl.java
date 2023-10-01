@@ -12,19 +12,10 @@ import java.util.concurrent.Executors;
 import static server.PlayerGames.*;
 
 public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
-    private static char[][] board = new char[3][3];
-    private static Queue<ClientService> waitingPlayers = new LinkedList<>();
-    private static ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private static List<TicTacToeGame> activeGames = new LinkedList<>();
+    private Queue<ClientService> waitingPlayers = new LinkedList<>();
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private List<TicTacToeGame> activeGames = new LinkedList<>();
 
-
-    static {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = ' ';
-            }
-        }
-    }
 
 
 
@@ -60,12 +51,27 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                     throw new RuntimeException(e);
                 }
             }).start();
+            endGame(game);
         }
         else if(result == Result.DRAW ){
             Score.draw(clientService.getCurrentPlayer().getUsername());
-            clientService.getResult(Result.DRAW);
+            new Thread(()->{
+                try {
+                    clientService.getResult(Result.DRAW);
+
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
             Score.draw(competitor.getCurrentPlayer().getUsername());
-            competitor.getResult(Result.DRAW);
+            new Thread(()->{
+                try {
+                    competitor.getResult(Result.DRAW);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+            endGame(game);
         }
         else if(result == Result.CONTINUE){
             switchTurn( clientService);
@@ -127,10 +133,11 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
      public String pong() throws RemoteException{
         return "OK";
      }
-
-    public static void endGame(TicTacToeGame game){
+     @Override
+    public void endGame(TicTacToeGame game) throws RemoteException{
         activeGames.remove(game);
         removeClientServiceByGame(game);
+        game.quitGame();
     }
 
 }

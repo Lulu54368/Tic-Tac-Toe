@@ -36,4 +36,8 @@ public interface ClientService extends Remote {
     ITicTacToeGame getGame() throws RemoteException;
 
     void play() throws RemoteException;
+
+    void quit() throws RemoteException;
+
+    void showHomePage() throws RemoteException;
 }

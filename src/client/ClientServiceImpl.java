@@ -46,23 +46,6 @@ public class ClientServiceImpl implements ClientService{
         System.out.println("register player "+ currentPlayer.getUsername());
         server.registerPlayer(this);
     }
-    private static void initializeBoard() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                board[i][j] = ' ';
-            }
-        }
-    }
-    private static void displayBoard() {
-        System.out.println("-------------");
-        for (int i = 0; i < 3; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < 3; j++) {
-                System.out.print(board[i][j] + " | ");
-            }
-            System.out.println("\n-------------");
-        }
-    }
 
     @Override
     public void startGame(boolean isFirst) throws RemoteException {
@@ -86,7 +69,7 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void getResult(Result result) throws RemoteException{
         if(result == Result.DRAW){
-            getClientGUI(this).showResult(result.result);
+            getClientGUI(this).showResult("It is a draw!");
         }else if(result == Result.RETRY){
             System.out.println("Player "+ currentPlayer.getUsername()+" "+ ", please input a valid value!");
             play();
@@ -151,5 +134,16 @@ public class ClientServiceImpl implements ClientService{
         counter = new Counter(this, server);
         counter.count();
         getClientGUI(this).play();
+    }
+    @Override
+    public void quit() throws RemoteException {
+        server.endGame((TicTacToeGame) game);
+
+    }
+
+    @Override
+    public void showHomePage() throws RemoteException {
+        if(counter != null) counter.cancel();
+        getClientGUI(this).showHomePage();
     }
 }

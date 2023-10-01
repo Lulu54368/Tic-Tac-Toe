@@ -31,8 +31,6 @@ public class ClientGui extends JFrame{
     private JButton sendButton;
     private static ClientGui clientGui;
     private ClientService clientService;
-    private char symbol;
-    private boolean isenabled = false;
     private List<JButton> jButtons= Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
 
     private ClientGui(ClientService clientService){
@@ -95,9 +93,18 @@ public class ClientGui extends JFrame{
                 }
             });
         });
+        quit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    clientService.quit();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
     }
     public void disableButton(){
-        isenabled = false;
         jButtons.stream().forEach(jButton -> {
             jButton.setEnabled(false);
         });
@@ -107,7 +114,6 @@ public class ClientGui extends JFrame{
     }
 
     private void enableButton(){
-        isenabled = true;
         jButtons.stream().forEach(jButton -> {
             jButton.setEnabled(true);
         });
@@ -153,5 +159,9 @@ public class ClientGui extends JFrame{
             JOptionPane.showMessageDialog(ClientGui.this, result+" win!");
         }
 
+    }
+
+    public void showHomePage() {
+        System.out.println("This is home page");
     }
 }

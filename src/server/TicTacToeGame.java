@@ -1,5 +1,4 @@
 package server;
-
 import client.ClientService;
 import client.Result;
 
@@ -76,16 +75,14 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         }
         return Result.END;
     }
-
-    public synchronized void quitGame(ClientService client) {
+    @Override
+    public synchronized void quitGame() {
         try {
             if (!gameFinished) {
-                //client.notify("Player quit the game.");
                 gameFinished = true;
             }
-            System.out.println("end game");
-            /*player1.endGame();
-            player2.endGame();*/
+            player1.showHomePage();
+            player2.showHomePage();
         } catch (Exception e) {
             e.printStackTrace();
         }
