@@ -35,22 +35,25 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
             competitor.addOnBoard(clientService.getCurrentPlayer().getSymbol(), row, col);
         }
         if(result == Result.WIN){
+            String winner = clientService.getCurrentPlayer().getUsername();
             Score.win(clientService.getCurrentPlayer().getUsername());
-            new Thread(()-> {
-                try {
-                    clientService.getResult(result, clientService.getCurrentPlayer().getUsername());
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
-            }).start();
             Score.lose(competitor.getCurrentPlayer().getUsername());
-            new Thread(()-> {
+            Thread winThread = new Thread(()-> {
                 try {
-                    competitor.getResult(result, clientService.getCurrentPlayer().getUsername());
+                    clientService.getResult(result, winner);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
-            }).start();
+            });
+            Thread loseThread = new Thread(()-> {
+                try {
+                    competitor.getResult(result, winner);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            winThread.start();
+            loseThread.start();
             endGame(game);
         }
         else if(result == Result.DRAW ){

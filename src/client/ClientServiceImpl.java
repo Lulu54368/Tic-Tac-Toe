@@ -68,9 +68,10 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void getResult(Result result, String username) throws RemoteException {
-        if (result == Result.WIN) {
-            getClientGUI(this).showResult(username + "win!");
+        if(result == Result.WIN){
+            getClientGUI(this).showResult(username + " win!");
         }
+
 
     }
 
