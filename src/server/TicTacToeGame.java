@@ -26,8 +26,6 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
     }
 
     public void start() throws RemoteException {
-        System.out.println("play1 " + player1.getCurrentPlayer().getUsername() +
-                " and play2 " + player2.getCurrentPlayer().getUsername() + " start");
         //TODO: choosing symbol randomly
         player1.getCurrentPlayer().setSymbol('X');
         player2.getCurrentPlayer().setSymbol('O');
@@ -37,7 +35,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         player2.setMessageBroker(messageBroker);
         new Thread(() -> {
             try {
-                player1.startGame(true);
+                player1.startGame(player1.getCurrentPlayer(), true);
             } catch (RemoteException e) {
                 //TODO: handle exception
                 throw new RuntimeException(e);
@@ -45,7 +43,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         }).start();
         new Thread(() -> {
             try {
-                player2.startGame(false);
+                player2.startGame(player1.getCurrentPlayer(), false);
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }

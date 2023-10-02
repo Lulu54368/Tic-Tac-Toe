@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 public interface ClientService extends Remote {
     public void registerPlayer() throws RemoteException;
 
-    void startGame(boolean isFirst) throws RemoteException;
+    void startGame(IPlayer currentPlayer, boolean isFirst) throws RemoteException;
 
     void play(int row, int col) throws RemoteException;
 

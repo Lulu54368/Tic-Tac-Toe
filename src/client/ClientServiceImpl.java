@@ -33,12 +33,14 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void startGame(boolean isFirst) throws RemoteException {
+    public void startGame(IPlayer currentPlayer, boolean isFirst) throws RemoteException {
         getStartGUI(this).startGame();
         if (isFirst) {
             play();
         }
-
+        else{
+            setTurn(currentPlayer);
+        }
     }
 
     @Override
@@ -80,9 +82,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void setTurn(IPlayer currentPlayer) throws RemoteException {
         //set competitor's turn
-        counter.cancel();
+        if(counter!= null) counter.cancel();
         getClientGUI(this).erase();
         getClientGUI(this).disableButton();
+        getClientGUI(this).showBanner(currentPlayer);
     }
 
     @Override
@@ -107,17 +110,20 @@ public class ClientServiceImpl implements ClientService {
     public ITicTacToeGame getGame() throws RemoteException {
         return game;
     }
-
     @Override
     public void setGame(ITicTacToeGame game) throws RemoteException {
         this.game = game;
     }
+
+
+
 
     @Override
     public void play() throws RemoteException {
         counter = new Counter(this, server);
         counter.count();
         getClientGUI(this).play();
+        getClientGUI(this).showBanner(currentPlayer);
     }
 
     @Override

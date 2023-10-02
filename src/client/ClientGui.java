@@ -114,8 +114,12 @@ public class ClientGui extends JFrame {
         });
     }
 
-    public void play() {
+    public void play() throws RemoteException {
         enableButton();
+    }
+    public void showBanner(IPlayer iPlayer) throws RemoteException {
+        String banner = "#"+iPlayer.getRank()+" "+ iPlayer.getUsername()+"("+iPlayer.getSymbol()+")";
+        username.setText(banner);
     }
 
     private void enableButton() {
