@@ -71,8 +71,7 @@ public class ClientServiceImpl implements ClientService{
         if(result == Result.DRAW){
             getClientGUI(this).showResult("It is a draw!");
         }else if(result == Result.RETRY){
-            System.out.println("Player "+ currentPlayer.getUsername()+" "+ ", please input a valid value!");
-            play();
+            getClientGUI(this).play();
         }
         else if(result == Result.END){
             System.out.println("The play end!");
@@ -82,7 +81,7 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void getResult(Result result, String username) throws RemoteException{
         if(result == Result.WIN){
-            getClientGUI(this).showResult(username);
+            getClientGUI(this).showResult(username+"win!");
         }
 
     }
@@ -104,7 +103,6 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public synchronized void updateMessage() throws RemoteException {
-        System.out.println(game);
         getClientGUI(this).showMessage(game.getMessage());
     }
 
@@ -143,7 +141,6 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void showHomePage() throws RemoteException {
-        if(counter != null) counter.cancel();
         getClientGUI(this).showHomePage();
     }
 }

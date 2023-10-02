@@ -153,11 +153,7 @@ public class ClientGui extends JFrame{
 
 
     public void showResult(String result) {
-        if(result == Result.DRAW.result){
-            JOptionPane.showMessageDialog(ClientGui.this, result);
-        }else{
-            JOptionPane.showMessageDialog(ClientGui.this, result+" win!");
-        }
+        JOptionPane.showMessageDialog(ClientGui.this, result);
 
     }
 
