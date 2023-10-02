@@ -9,9 +9,9 @@ public interface IPlayer extends Remote {
 
     void setSymbol(char symbol) throws RemoteException;
 
-    void setRank(int rank) throws RemoteException;
-
     String getUsername() throws RemoteException;
 
     int getRank() throws RemoteException;
+
+    void setRank(int rank) throws RemoteException;
 }

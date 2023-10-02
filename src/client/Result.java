@@ -10,6 +10,7 @@ public enum Result implements Serializable {
     END("end"),
     RETRY("retry");
     String result;
+
     Result(String result) {
         this.result = result;
     }

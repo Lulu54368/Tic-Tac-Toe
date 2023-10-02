@@ -13,6 +13,7 @@ public class ClientServer {
     private static Integer portNumber;
     private static String ip;
     private static String username;
+
     public static void main(String[] args) throws RemoteException, NotBoundException {
         if (args.length < 3) {
             //logger.error("Please enter proper input!");

@@ -3,13 +3,13 @@ package client;
 import server.IPlayer;
 import server.ITicTacToeGame;
 import server.MessageBroker;
-import server.TicTacToeGame;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ClientService extends Remote {
     public void registerPlayer() throws RemoteException;
+
     void startGame(boolean isFirst) throws RemoteException;
 
     void play(int row, int col) throws RemoteException;
@@ -31,15 +31,16 @@ public interface ClientService extends Remote {
 
     void sendMessage(String message) throws RemoteException;
 
-    void setGame(ITicTacToeGame game) throws RemoteException;
-
     ITicTacToeGame getGame() throws RemoteException;
+
+    void setGame(ITicTacToeGame game) throws RemoteException;
 
     void play() throws RemoteException;
 
     void quit() throws RemoteException;
 
     void showHomePage() throws RemoteException;
+
     MessageBroker getMessageBroker() throws RemoteException;
 
     void setMessageBroker(MessageBroker messageBroker) throws RemoteException;

@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class ClientGui extends JFrame{
+public class ClientGui extends JFrame {
+    private static ClientGui clientGui;
     private JTextArea timer;
     private JTextPane playerchat;
     private JButton button1;
@@ -29,21 +30,22 @@ public class ClientGui extends JFrame{
     private JPanel clientPanel;
     private JTextField username;
     private JButton sendButton;
-    private static ClientGui clientGui;
     private ClientService clientService;
-    private List<JButton> jButtons= Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
+    private List<JButton> jButtons = Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
 
-    private ClientGui(ClientService clientService){
+    private ClientGui(ClientService clientService) {
         initialiseGUI();
         disableButton();
         this.clientService = clientService;
     }
-    public static ClientGui getClientGUI(ClientService clientService){
-        if(clientGui == null){
+
+    public static ClientGui getClientGUI(ClientService clientService) {
+        if (clientGui == null) {
             clientGui = new ClientGui(clientService);
         }
         return clientGui;
     }
+
     private void initialiseGUI() {
         setContentPane(clientPanel);
         setTitle("Tic-Tac-Toe Client GUI");
@@ -54,14 +56,15 @@ public class ClientGui extends JFrame{
 
 
     }
+
     public void startGame(String username, int rank) {
-        this.username.setText("#" + rank+" " +username);
+        this.username.setText("#" + rank + " " + username);
 
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Thread submitMessage = new Thread(()->
+                    Thread submitMessage = new Thread(() ->
                     {
                         try {
                             clientService.sendMessage(playerContent.getText());
@@ -81,8 +84,8 @@ public class ClientGui extends JFrame{
             jButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int row = jButtons.indexOf(jButton)/3;
-                    int col = jButtons.indexOf(jButton)%3;
+                    int row = jButtons.indexOf(jButton) / 3;
+                    int col = jButtons.indexOf(jButton) % 3;
                     try {
                         disableButton();
                         clientService.play(row, col);
@@ -104,16 +107,18 @@ public class ClientGui extends JFrame{
             }
         });
     }
-    public void disableButton(){
+
+    public void disableButton() {
         jButtons.stream().forEach(jButton -> {
             jButton.setEnabled(false);
         });
     }
-    public void play(){
+
+    public void play() {
         enableButton();
     }
 
-    private void enableButton(){
+    private void enableButton() {
         jButtons.stream().forEach(jButton -> {
             jButton.setEnabled(true);
         });
@@ -121,18 +126,18 @@ public class ClientGui extends JFrame{
 
 
     public void showTime(int time) {
-        timer.setText("Timer\n"+ time);
+        timer.setText("Timer\n" + time);
     }
 
     public void showMessage(Queue<Map<IPlayer, String>> messageQueue) {
         String chat = messageQueue.stream()
-                .map(q->q
+                .map(q -> q
                         .entrySet()
                         .stream()
-                        .map(m-> {
+                        .map(m -> {
                             try {
-                                String name = "#"+ m.getKey().getRank()+ " "+ m.getKey().getUsername();
-                                return name + " "+ m.getValue()+ "\n";
+                                String name = "#" + m.getKey().getRank() + " " + m.getKey().getUsername();
+                                return name + " " + m.getValue() + "\n";
                             } catch (RemoteException e) {
                                 throw new RuntimeException(e);
                             }
@@ -143,11 +148,12 @@ public class ClientGui extends JFrame{
         playerchat.setText(chat);
     }
 
-    public void addOnBoard(char symbol, int index){
+    public void addOnBoard(char symbol, int index) {
         jButtons.get(index)
                 .setText(String.valueOf(symbol));
     }
-    public void erase(){
+
+    public void erase() {
         timer.setText("");
     }
 

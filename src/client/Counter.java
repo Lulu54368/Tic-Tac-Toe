@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Counter extends TimerTask implements  Serializable {
+public class Counter extends TimerTask implements Serializable {
 
     int time = 20;
     ClientService currentPlayer;
@@ -21,7 +21,7 @@ public class Counter extends TimerTask implements  Serializable {
 
     @Override
     public void run() {
-        if(time == 0 ){
+        if (time == 0) {
             System.out.println("time out!");
             try {
                 ticTacToeService.switchTurn(currentPlayer);
@@ -31,7 +31,7 @@ public class Counter extends TimerTask implements  Serializable {
             cancel();
             return;
         }
-        if(time > 0){
+        if (time > 0) {
             try {
                 currentPlayer.sendTime(time);
             } catch (RemoteException e) {
@@ -48,7 +48,8 @@ public class Counter extends TimerTask implements  Serializable {
         TimerTask timerTask = this;
         timer.scheduleAtFixedRate(timerTask, 0, 1000L);
     }
-    public boolean cancel(){
+
+    public boolean cancel() {
         timer.cancel();
         return true;
     }

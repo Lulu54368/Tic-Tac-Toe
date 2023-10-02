@@ -13,7 +13,7 @@ public class MessageBrokerImpl implements MessageBroker, Serializable {
 
     @Override
     public synchronized void sendMessage(IPlayer iPlayer, String message) throws RemoteException {
-        if(messageQueue.size() >=10){
+        if (messageQueue.size() >= 10) {
             messageQueue.poll();
         }
         Map<IPlayer, String> messageToAdd = new HashMap<>();
@@ -22,7 +22,7 @@ public class MessageBrokerImpl implements MessageBroker, Serializable {
     }
 
     @Override
-    public synchronized Queue<Map<IPlayer, String>> getMessageQueue() throws RemoteException{
+    public synchronized Queue<Map<IPlayer, String>> getMessageQueue() throws RemoteException {
         return messageQueue;
     }
 }
