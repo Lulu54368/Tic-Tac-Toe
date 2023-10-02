@@ -29,13 +29,11 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void registerPlayer() throws RemoteException {
-        System.out.println("register player " + currentPlayer.getUsername());
         server.registerPlayer(this);
     }
 
     @Override
     public void startGame(boolean isFirst) throws RemoteException {
-        System.out.println(currentPlayer.getUsername() + " start with " + currentPlayer.getSymbol());
         getStartGUI(this).startGame();
         if (isFirst) {
             play();
@@ -85,8 +83,6 @@ public class ClientServiceImpl implements ClientService {
         counter.cancel();
         getClientGUI(this).erase();
         getClientGUI(this).disableButton();
-        System.out.println("Its " + currentPlayer.getUsername() + " turn!");
-        System.out.println("ranking " + currentPlayer.getRank());
     }
 
     @Override
@@ -132,6 +128,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void showHomePage() throws RemoteException {
+        if(counter != null) counter.cancel();
         getClientGUI(this).clear();
         getStartGUI(this).showHomePage();
     }
@@ -151,15 +148,17 @@ public class ClientServiceImpl implements ClientService {
         public void run() {
             try {
                 while (true) {
+                    server.pong();
                     Thread.sleep(1000);
                 }
             } catch (Exception e) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ex) {
+                    System.exit(0);
                     ex.printStackTrace();
                 }
-                System.exit(0);
+
             }
         }
     }
