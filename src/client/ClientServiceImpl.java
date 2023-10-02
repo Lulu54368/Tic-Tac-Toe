@@ -14,6 +14,7 @@ public class ClientServiceImpl implements ClientService{
     Player currentPlayer;
     ITicTacToeGame game;
     Counter counter;
+    MessageBroker messageBroker;
     class HeartBeat extends Thread{
         @Override
         public void run(){
@@ -100,11 +101,13 @@ public class ClientServiceImpl implements ClientService{
         System.out.println("ranking "+ currentPlayer.getRank());
     }
 
-
     @Override
-    public synchronized void updateMessage() throws RemoteException {
-        getClientGUI(this).showMessage(game.getMessage());
+    public void updateMessage(String message, IPlayer player) throws RemoteException {
+        messageBroker.sendMessage(player, message);
+        getClientGUI(this).showMessage(messageBroker.getMessageQueue());
+
     }
+
 
     @Override
     public void sendTime(int time) throws RemoteException {
@@ -113,9 +116,7 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void sendMessage(String message) throws RemoteException {
         //TODO: should refer to the same game object
-        ClientService anotherPlayer = getAnotherPlayer((TicTacToeGame) game, this);
-        anotherPlayer.getGame().updateMessage(currentPlayer, message);
-        game.updateMessage(currentPlayer, message);
+        server.sendMessage(this, message, currentPlayer);
     }
 
     @Override
@@ -142,5 +143,15 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void showHomePage() throws RemoteException {
         getClientGUI(this).showHomePage();
+    }
+
+    @Override
+    public MessageBroker getMessageBroker() throws RemoteException {
+        return messageBroker;
+    }
+
+    @Override
+    public void setMessageBroker(MessageBroker messageBroker) throws RemoteException {
+        this.messageBroker =messageBroker;
     }
 }

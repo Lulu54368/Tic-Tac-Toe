@@ -4,9 +4,6 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Map;
-import java.util.Queue;
-import static server.PlayerGames.putClientGameEntry;
 
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
     private ClientService player1;
@@ -24,8 +21,6 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         this.board = new char[3][3];
         MessageBroker messageBroker = new MessageBrokerImpl();
         this.messageBroker = messageBroker;
-        putClientGameEntry(this, player1);
-        putClientGameEntry(this, player2);
         player1.setGame(this);
         player2.setGame(this);
         System.out.println("game in both player" +String.valueOf(player1.getGame() == player2.getGame()));
@@ -38,6 +33,9 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         player1.getCurrentPlayer().setSymbol('X');
         player2.getCurrentPlayer().setSymbol('O');
         gameFinished = false;
+        MessageBroker messageBroker = new MessageBrokerImpl();
+        player1.setMessageBroker(messageBroker);
+        player2.setMessageBroker(messageBroker);
         new Thread(()-> {
             try {
                 player1.startGame(true);
@@ -122,20 +120,5 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         return true;
     }
 
-    public boolean isGameFinished() {
-        return gameFinished;
-    }
-    @Override
-    public void updateMessage(IPlayer iPlayer, String message) throws RemoteException {
-        messageBroker.sendMessage(iPlayer, message);
-        //TODO: two players should refer to the same game object
-        player1.updateMessage();
-        player2.updateMessage();
-    }
-
-    @Override
-    public Queue<Map<IPlayer, String>> getMessage() throws RemoteException {
-        return messageBroker.getMessageQueue();
-    }
 }
 

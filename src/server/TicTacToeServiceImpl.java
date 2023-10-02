@@ -112,8 +112,11 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 ClientService player1 = waitingPlayers.poll();
                 ClientService player2 = waitingPlayers.poll();
                 TicTacToeGame game = null;
+
                 try {
                     game = new TicTacToeGame(player1, player2);
+                    putClientGameEntry(game, player1);
+                    putClientGameEntry(game, player2);
                 } catch (RemoteException e) {
                     //TODO: handle exception
                     throw new RuntimeException(e);
@@ -139,5 +142,12 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         removeClientServiceByGame(game);
         game.quitGame();
     }
+
+    @Override
+    public void sendMessage(ClientService player, String message, IPlayer currentPlayer) throws RemoteException {
+        player.updateMessage(message, currentPlayer);
+        getAnotherPlayer(getGameByPlayer(player), player).updateMessage(message, currentPlayer);
+    }
+
 
 }

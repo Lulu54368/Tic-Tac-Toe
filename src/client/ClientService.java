@@ -25,7 +25,7 @@ public interface ClientService extends Remote {
 
     void setTurn(IPlayer currentPlayer) throws RemoteException;
 
-    void updateMessage() throws RemoteException;
+    void updateMessage(String message, IPlayer player) throws RemoteException;
 
     void sendTime(int time) throws RemoteException;
 
@@ -40,4 +40,7 @@ public interface ClientService extends Remote {
     void quit() throws RemoteException;
 
     void showHomePage() throws RemoteException;
+    MessageBroker getMessageBroker() throws RemoteException;
+
+    void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
 }
