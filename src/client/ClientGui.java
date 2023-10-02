@@ -51,7 +51,7 @@ public class ClientGui extends JFrame {
         setTitle("Tic-Tac-Toe Client GUI");
         setSize(640, 200);
         setLocationRelativeTo(null);
-        setVisible(true);
+        setVisible(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 
@@ -163,7 +163,11 @@ public class ClientGui extends JFrame {
 
     }
 
-    public void showHomePage() {
-        System.out.println("This is home page");
+    public void clear() {
+        erase();
+        jButtons.stream().forEach(jButton -> {
+            jButton.setText("");
+        });
+        setVisible(false);
     }
 }

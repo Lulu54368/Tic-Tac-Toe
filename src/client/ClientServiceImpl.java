@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import static client.ClientGui.getClientGUI;
+import static client.StartGUI.getStartGUI;
 
 public class ClientServiceImpl implements ClientService {
     private static char[][] board = new char[3][3];
@@ -22,6 +23,7 @@ public class ClientServiceImpl implements ClientService {
         new HeartBeat().start();
         UnicastRemoteObject
                 .exportObject(this, 0);
+        getStartGUI(this);
 
     }
 
@@ -34,6 +36,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void startGame(boolean isFirst) throws RemoteException {
         System.out.println(currentPlayer.getUsername() + " start with " + currentPlayer.getSymbol());
+        getStartGUI(this).startGame();
         if (isFirst) {
             play();
         }
@@ -129,7 +132,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void showHomePage() throws RemoteException {
-        getClientGUI(this).showHomePage();
+        getClientGUI(this).clear();
+        getStartGUI(this).showHomePage();
     }
 
     @Override
