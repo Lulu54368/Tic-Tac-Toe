@@ -129,8 +129,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void quit() throws RemoteException {
-        server.endGame((TicTacToeGame) game);
-
+        server.lose(this);
     }
 
     @Override
