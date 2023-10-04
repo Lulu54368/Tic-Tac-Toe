@@ -8,14 +8,16 @@ import java.rmi.RemoteException;
 import static client.ClientGui.getClientGUI;
 
 public class StartGUI extends JFrame{
+    private static final String LOADING_SERVER = "Loading the server ...";
+    private final String WAITING_MATCHING="Please wait for a match...";
+    private final String ENTER_INPUT="Please make a choice...";
+
     private JPanel homePagePanel;
     private JTextField message;
     private JButton quitButton;
     private JButton startButton;
     private static StartGUI startGUI;
     private ClientService clientService;
-    private final String WAITING_MATCHING="Please wait for a match...";
-    private final String ENTER_INPUT="Please make a choice...";
 
     private StartGUI(ClientService clientService) {
         initialiseGUI();
@@ -28,7 +30,8 @@ public class StartGUI extends JFrame{
                     clientService.registerPlayer();
                 } catch (RemoteException ex) {
                     //TODO: handle exception
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace();
+                    message.setText("Unable to start, please try again");
                 }
                 waitingForMatch();
 
@@ -75,5 +78,12 @@ public class StartGUI extends JFrame{
         startButton.setVisible(false);
         quitButton.setVisible(false);
         message.setText(WAITING_MATCHING);
+    }
+
+    public void loadServer() {
+        startButton.setVisible(false);
+        quitButton.setVisible(false);
+        message.setText(LOADING_SERVER);
+
     }
 }
