@@ -4,10 +4,9 @@ import server.TicTacToeService;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+
+import static client.ClientGui.getClientGUI;
 
 public class Counter extends TimerTask implements Serializable {
 
@@ -26,14 +25,23 @@ public class Counter extends TimerTask implements Serializable {
         if (time == 0) {
             try {
                 currentPlayer.sendTime(time);
-                Random random = new Random();
-                int row = -1;
-                int col = -1;
-                while (!currentPlayer.getGame().isValidMove(row, col)){
-                    row = Arrays.asList(0,1,2).get(random.nextInt(3));
-                    col = Arrays.asList(0,1,2).get(random.nextInt(3));
+                List<Integer> rowList = Arrays.asList(0, 1, 2);
+                List<Integer> colList = Arrays.asList(0, 1,2);
+                Collections.shuffle(rowList);
+                Collections.shuffle(colList);
+                for(int row: rowList){
+                    for(int col:colList){
+                        if(currentPlayer.getGame().isValidMove(row, col)){
+                            currentPlayer.play(row, col);
+                            getClientGUI(currentPlayer).notify("Time out! Place row "+ row+" col "+ col+" for you!");
+                            return;
+                        }
+
+
+                    }
+                    break;
                 }
-                currentPlayer.play(row, col);
+
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }

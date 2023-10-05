@@ -211,4 +211,8 @@ public class ClientGui extends JFrame {
             getStartGUI(clientService).setVisible(false);
         }
     }
+
+    public void notify(String s) {
+        JOptionPane.showMessageDialog(ClientGui.this, s);
+    }
 }
