@@ -5,18 +5,19 @@ import client.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static server.PlayerGames.*;
 
-public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTacToeService{
+public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacToeService {
     private Queue<ClientService> waitingPlayers = new LinkedList<>();
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
     private List<TicTacToeGame> activeGames = new LinkedList<>();
-
-
 
 
     public TicTacToeServiceImpl() throws RemoteException {
@@ -24,22 +25,20 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
     }
 
 
-
     @Override
-    public void addOnBoard(ClientService clientService, int row, int col)  throws RemoteException{
+    public void addOnBoard(ClientService clientService, int row, int col) throws RemoteException {
         TicTacToeGame game = PlayerGames.getGameByPlayer(clientService);
         ClientService competitor = getAnotherPlayer(game, clientService);
         Result result = game.makeMove(row, col, clientService.getCurrentPlayer().getSymbol());
-        if(result != Result.RETRY && result != Result.END){
+        if (result != Result.RETRY && result != Result.END) {
             clientService.addOnBoard(clientService.getCurrentPlayer().getSymbol(), row, col);
             competitor.addOnBoard(clientService.getCurrentPlayer().getSymbol(), row, col);
         }
-        if(result == Result.WIN){
+        if (result == Result.WIN) {
             lose(competitor);
-        }
-        else if(result == Result.DRAW ){
+        } else if (result == Result.DRAW) {
             Score.draw(clientService.getCurrentPlayer().getUsername());
-            new Thread(()->{
+            new Thread(() -> {
                 try {
                     clientService.getResult(Result.DRAW);
 
@@ -48,7 +47,7 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 }
             }).start();
             Score.draw(competitor.getCurrentPlayer().getUsername());
-            new Thread(()->{
+            new Thread(() -> {
                 try {
                     competitor.getResult(Result.DRAW);
                 } catch (RemoteException e) {
@@ -56,15 +55,15 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 }
             }).start();
             endGame(game);
-        }
-        else if(result == Result.CONTINUE){
-            switchTurn( clientService);
-        }else if(result == Result.RETRY){
+        } else if (result == Result.CONTINUE) {
+            switchTurn(clientService);
+        } else if (result == Result.RETRY) {
             clientService.getResult(Result.RETRY);
         }
     }
+
     @Override
-    public  void switchTurn( ClientService player) throws RemoteException {
+    public void switchTurn(ClientService player) throws RemoteException {
         TicTacToeGame ticTacToeGame = getGameByPlayer(player);
         ClientService competitor = getAnotherPlayer(ticTacToeGame, player);
         player.setTurn(competitor.getCurrentPlayer());
@@ -78,12 +77,12 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         int rank = Score.getRank(clientService.getCurrentPlayer().getUsername());
         clientService.getCurrentPlayer().setRank(rank);
         waitingPlayers.offer(clientService);
-        System.out.println("Player "+clientService.getCurrentPlayer().getUsername()+" registered.");
+        System.out.println("Player " + clientService.getCurrentPlayer().getUsername() + " registered.");
         tryMatchPlayers();
     }
 
     private void tryMatchPlayers() {
-        executorService.submit(()->{
+        executorService.submit(() -> {
             //TODO: assign player randomly
             try {
                 Thread.sleep(10000);
@@ -91,7 +90,7 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
                 //TODO: handle exception
                 throw new RuntimeException(e);
             }
-            Collections.shuffle((LinkedList)waitingPlayers);
+            Collections.shuffle((LinkedList) waitingPlayers);
             while (waitingPlayers.size() >= 2) {
                 ClientService player1 = waitingPlayers.poll();
                 ClientService player2 = waitingPlayers.poll();
@@ -116,12 +115,14 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         });
 
     }
+
     @Override
-     public String pong() throws RemoteException{
+    public String pong() throws RemoteException {
         return "OK";
-     }
-     @Override
-    public void endGame(TicTacToeGame game) throws RemoteException{
+    }
+
+    @Override
+    public void endGame(TicTacToeGame game) throws RemoteException {
         activeGames.remove(game);
         removeClientServiceByGame(game);
         game.quitGame();
@@ -132,20 +133,21 @@ public class TicTacToeServiceImpl  extends UnicastRemoteObject implements TicTac
         player.updateMessage(message, currentPlayer);
         getAnotherPlayer(getGameByPlayer(player), player).updateMessage(message, currentPlayer);
     }
+
     @Override
     public void lose(ClientService losePlayer) throws RemoteException {
         TicTacToeGame game = PlayerGames.getGameByPlayer(losePlayer);
         ClientService winnerPlayer = getAnotherPlayer(game, losePlayer);
         Score.win(winnerPlayer.getCurrentPlayer().getUsername());
         Score.lose(losePlayer.getCurrentPlayer().getUsername());
-        Thread winThread = new Thread(()-> {
+        Thread winThread = new Thread(() -> {
             try {
                 winnerPlayer.getResult(Result.WIN, winnerPlayer.getCurrentPlayer().getUsername());
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
         });
-        Thread loseThread = new Thread(()-> {
+        Thread loseThread = new Thread(() -> {
             try {
                 losePlayer.getResult(Result.WIN, winnerPlayer.getCurrentPlayer().getUsername());
             } catch (RemoteException e) {

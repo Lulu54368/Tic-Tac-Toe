@@ -16,14 +16,16 @@ public class ClientServiceImpl implements ClientService {
     MessageBroker messageBroker;
     private TicTacToeService server;
 
+    private boolean isFinished = true;
+
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
         this.server = server;
         this.currentPlayer = new Player(username);
-        new HeartBeat().start();
         UnicastRemoteObject
                 .exportObject(this, 0);
         getStartGUI(this);
+        isFinished = true;
 
     }
 
@@ -35,10 +37,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void startGame(IPlayer currentPlayer, boolean isFirst) throws RemoteException {
         getStartGUI(this).startGame();
+        isFinished = false;
         if (isFirst) {
             play();
-        }
-        else{
+        } else {
             setTurn(currentPlayer);
         }
     }
@@ -57,6 +59,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void getResult(Result result) throws RemoteException {
         if (result == Result.DRAW) {
+            isFinished = true;
             getClientGUI(this).showResult("It is a draw!");
         } else if (result == Result.RETRY) {
             getClientGUI(this).play();
@@ -68,7 +71,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void getResult(Result result, String username) throws RemoteException {
-        if(result == Result.WIN){
+        if (result == Result.WIN) {
+            isFinished = true;
             getClientGUI(this).showResult(username + " win!");
         }
 
@@ -83,7 +87,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void setTurn(IPlayer currentPlayer) throws RemoteException {
         //set competitor's turn
-        if(counter!= null) counter.cancel();
+        if (counter != null) counter.cancel();
         getClientGUI(this).erase();
         getClientGUI(this).disableButton();
         getClientGUI(this).showBanner(currentPlayer);
@@ -111,12 +115,11 @@ public class ClientServiceImpl implements ClientService {
     public ITicTacToeGame getGame() throws RemoteException {
         return game;
     }
+
     @Override
     public void setGame(ITicTacToeGame game) throws RemoteException {
         this.game = game;
     }
-
-
 
 
     @Override
@@ -130,11 +133,12 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void quit() throws RemoteException {
         server.lose(this);
+        isFinished = true;
     }
 
     @Override
     public void showHomePage() throws RemoteException {
-        if(counter != null) counter.cancel();
+        if (counter != null) counter.cancel();
         getClientGUI(this).clear();
         getStartGUI(this).showHomePage();
     }
@@ -149,23 +153,8 @@ public class ClientServiceImpl implements ClientService {
         this.messageBroker = messageBroker;
     }
 
-    class HeartBeat extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    server.pong();
-                    Thread.sleep(1000);
-                }
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    System.exit(0);
-                    ex.printStackTrace();
-                }
-
-            }
-        }
+    @Override
+    public boolean isFinished() {
+        return isFinished;
     }
 }

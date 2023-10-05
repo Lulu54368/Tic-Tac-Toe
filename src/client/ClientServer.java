@@ -6,7 +6,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static client.ClientGui.getClientGUI;
 import static client.StartGUI.getStartGUI;
@@ -28,6 +30,8 @@ public class ClientServer {
         username = args[0];
         try {
             connectServer();
+            clientService.registerPlayer();
+            getClientGUI(clientService).startGame(username, clientService.currentPlayer.getRank());
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -35,16 +39,15 @@ public class ClientServer {
         checkStatus();
 
     }
+
     private static void connectServer() throws NotBoundException, RemoteException {
         Registry registry = LocateRegistry.getRegistry(ip, portNumber);
         server = (TicTacToeService) registry
                 .lookup("TicTacToeService");
         clientService = new ClientServiceImpl(server, username);
-        clientService.registerPlayer();
-        getClientGUI(clientService).startGame(username, clientService.currentPlayer.getRank());
     }
 
-    private static void checkStatus(){
+    private static void checkStatus() {
         try {
             ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
             Runnable checkServerStatus = () -> {
@@ -53,8 +56,7 @@ public class ClientServer {
                     server.pong();
                 } catch (Exception e) {
                     try {
-                        //TODO: let the server loading for 5 sec
-                        e.printStackTrace();
+                        getClientGUI(clientService).setVisible(false);
                         getStartGUI(clientService).loadServer();
                         Thread.sleep(5000);
                     } catch (InterruptedException ex) {
@@ -63,6 +65,7 @@ public class ClientServer {
                     try {
                         //check the connection after 5 sc
                         server.pong();
+                        getClientGUI(clientService).resume();
                     } catch (RemoteException ex) {
                         try {
                             //try to connect to the server
@@ -71,20 +74,17 @@ public class ClientServer {
                             getClientGUI(clientService).clear();
                             getStartGUI(clientService).showHomePage();
                         } catch (Exception exc) {
-                            exc.printStackTrace();
-                            System.exit(-1);
+                            System.exit(0);
                         }
                     }
                 }
             };
-
             executorService.scheduleAtFixedRate(checkServerStatus, 0, 1000, TimeUnit.MILLISECONDS);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.exit(0);
         }
     }
-
 
 
 }

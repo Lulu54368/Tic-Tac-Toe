@@ -5,12 +5,16 @@ import server.IPlayer;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
+
+import static client.StartGUI.getStartGUI;
 
 public class ClientGui extends JFrame {
     private static ClientGui clientGui;
@@ -99,14 +103,37 @@ public class ClientGui extends JFrame {
         quit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    clientService.quit();
-                } catch (RemoteException ex) {
-                    throw new RuntimeException(ex);
+                int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
+                if (response == JOptionPane.YES_OPTION) {
+                    try {
+                        clientService.quit();
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Handle close event here
+                // You can perform cleanup or confirmation actions before closing the window.
+                // For example, you can ask the user if they really want to exit.
+                int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
+                if (response == JOptionPane.YES_OPTION) {
+                    // Close the window
+                    try {
+                        clientService.quit();
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+
+
     }
+
 
     public void disableButton() {
         jButtons.stream().forEach(jButton -> {
@@ -117,8 +144,9 @@ public class ClientGui extends JFrame {
     public void play() throws RemoteException {
         enableButton();
     }
+
     public void showBanner(IPlayer iPlayer) throws RemoteException {
-        String banner = "#"+iPlayer.getRank()+" "+ iPlayer.getUsername()+"("+iPlayer.getSymbol()+")";
+        String banner = "#" + iPlayer.getRank() + " " + iPlayer.getUsername() + "(" + iPlayer.getSymbol() + ")";
         username.setText(banner);
     }
 
@@ -173,5 +201,12 @@ public class ClientGui extends JFrame {
             jButton.setText("");
         });
         setVisible(false);
+    }
+
+    public void resume() throws RemoteException {
+        if (!clientService.isFinished()) {
+            setVisible(true);
+            getStartGUI(clientService).setVisible(false);
+        }
     }
 }
