@@ -200,6 +200,8 @@ public class ClientGui extends JFrame {
         jButtons.stream().forEach(jButton -> {
             jButton.setText("");
         });
+        playerContent.setText("");
+        playerchat.setText("");
         setVisible(false);
     }
 

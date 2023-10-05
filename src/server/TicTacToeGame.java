@@ -5,25 +5,25 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
     private boolean gameFinished;
-    private MessageBroker messageBroker;
-
+    private List<int[][]>gameBoard = new LinkedList<>();
 
     public TicTacToeGame(ClientService player1, ClientService player2) throws RemoteException {
         this.player1 = player1;
         this.player2 = player2;
         this.board = new char[3][3];
-        MessageBroker messageBroker = new MessageBrokerImpl();
-        this.messageBroker = messageBroker;
         player1.setGame(this);
         player2.setGame(this);
         System.out.println("game in both player" + String.valueOf(player1.getGame() == player2.getGame()));
     }
+
 
     public void start() throws RemoteException {
         //TODO: choosing symbol randomly
@@ -83,8 +83,8 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         }
     }
 
-
-    private boolean isValidMove(int row, int col) {
+    @Override
+    public boolean isValidMove(int row, int col) {
         return row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == 0;
 
     }

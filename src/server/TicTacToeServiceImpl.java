@@ -5,10 +5,7 @@ import client.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,7 +38,6 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
             new Thread(() -> {
                 try {
                     clientService.getResult(Result.DRAW);
-
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -158,6 +154,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         loseThread.start();
         endGame(game);
     }
+
 
 
 }

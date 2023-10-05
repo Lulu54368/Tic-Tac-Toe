@@ -41,8 +41,6 @@ public interface ClientService extends Remote {
 
     void showHomePage() throws RemoteException;
 
-    MessageBroker getMessageBroker() throws RemoteException;
-
     void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
 
     boolean isFinished() throws RemoteException;

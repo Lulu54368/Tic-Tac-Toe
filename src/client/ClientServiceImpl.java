@@ -142,12 +142,6 @@ public class ClientServiceImpl implements ClientService {
         getClientGUI(this).clear();
         getStartGUI(this).showHomePage();
     }
-
-    @Override
-    public MessageBroker getMessageBroker() throws RemoteException {
-        return messageBroker;
-    }
-
     @Override
     public void setMessageBroker(MessageBroker messageBroker) throws RemoteException {
         this.messageBroker = messageBroker;

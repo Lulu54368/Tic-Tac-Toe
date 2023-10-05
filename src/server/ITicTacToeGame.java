@@ -6,4 +6,5 @@ public interface ITicTacToeGame extends Remote {
 
     void quitGame();
 
+    boolean isValidMove(int row, int col);
 }
