@@ -5,7 +5,10 @@ import client.Result;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,7 +27,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
 
     @Override
     public void addOnBoard(ClientService clientService, int row, int col) throws RemoteException {
-        TicTacToeGame game = PlayerGames.getGameByPlayer(clientService);
+        TicTacToeGame game = getGameByPlayer(clientService);
         ClientService competitor = getAnotherPlayer(game, clientService);
         Result result = game.makeMove(row, col, clientService.getCurrentPlayer().getSymbol());
         if (result != Result.RETRY && result != Result.END) {
@@ -155,6 +158,13 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         endGame(game);
     }
 
+    @Override
+    public int[] playInRandomPosition(ClientService currentPlayer) throws RemoteException {
+        TicTacToeGame game = getGameByPlayer(currentPlayer);
+        int[] component = game.getPosition(currentPlayer);
+        currentPlayer.play(component[0], component[1]);
+        return component;
+    }
 
 
 }

@@ -4,7 +4,8 @@ import server.TicTacToeService;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static client.ClientGui.getClientGUI;
 
@@ -20,38 +21,24 @@ public class Counter extends TimerTask implements Serializable {
         this.ticTacToeService = ticTacToeService;
     }
 
+
     @Override
     public void run() {
         if (time == 0) {
             try {
                 currentPlayer.sendTime(time);
-                List<Integer> rowList = Arrays.asList(0, 1, 2);
-                List<Integer> colList = Arrays.asList(0, 1,2);
-                Collections.shuffle(rowList);
-                Collections.shuffle(colList);
-                for(int row: rowList){
-                    for(int col:colList){
-                        if(currentPlayer.getGame().isValidMove(row, col)){
-                            currentPlayer.play(row, col);
-                            getClientGUI(currentPlayer).notify("Time out! Place row "+ row+" col "+ col+" for you!");
-                            return;
-                        }
-
-
-                    }
-                    break;
-                }
-
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
-            /*try {
-                ticTacToeService.switchTurn(currentPlayer);
+            try {
+                int[] component = ticTacToeService.playInRandomPosition(currentPlayer);
+                getClientGUI(currentPlayer)
+                        .notify("Time out! Place row " + component[0] + " col " + component[1] + " for you!");
+                cancel();
+                return;
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
-            }*/
-            cancel();
-            return;
+            }
         }
         if (time > 0) {
             try {
@@ -62,7 +49,6 @@ public class Counter extends TimerTask implements Serializable {
             }
             time--;
         }
-
 
 
     }

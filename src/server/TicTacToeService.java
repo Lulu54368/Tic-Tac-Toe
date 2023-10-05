@@ -19,4 +19,6 @@ public interface TicTacToeService extends Remote {
     void sendMessage(ClientService player, String message, IPlayer currentPlayer) throws RemoteException;
 
     void lose(ClientService losePlayer) throws RemoteException;
+
+    int[] playInRandomPosition(ClientService currentPlayer) throws RemoteException;
 }

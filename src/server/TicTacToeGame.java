@@ -5,15 +5,17 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
+    List<int[]> list = new LinkedList<>();
     private ClientService player1;
     private ClientService player2;
     private char[][] board;
     private boolean gameFinished;
-    private List<int[][]>gameBoard = new LinkedList<>();
 
     public TicTacToeGame(ClientService player1, ClientService player2) throws RemoteException {
         this.player1 = player1;
@@ -21,6 +23,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         this.board = new char[3][3];
         player1.setGame(this);
         player2.setGame(this);
+        initiateBoard();
         System.out.println("game in both player" + String.valueOf(player1.getGame() == player2.getGame()));
     }
 

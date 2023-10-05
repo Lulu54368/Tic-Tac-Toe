@@ -2,6 +2,7 @@ package server;
 
 import client.ClientService;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 
 public class PlayerGames {
@@ -28,7 +29,8 @@ public class PlayerGames {
                 .map(e -> playerGame.remove(e.getKey(), game));
     }
 
-    public static void putClientGameEntry(TicTacToeGame ticTacToeGame, ClientService clientService) {
+    public static void putClientGameEntry(TicTacToeGame ticTacToeGame, ClientService clientService) throws RemoteException {
+        System.out.println("put " + clientService + " game " + ticTacToeGame);
         playerGame.put(clientService, ticTacToeGame);
     }
 
