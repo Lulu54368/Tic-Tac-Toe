@@ -121,5 +121,28 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         return true;
     }
 
+    private void initiateBoard() {
+        List<Integer> rowList = Arrays.asList(0, 1, 2);
+        List<Integer> colList = Arrays.asList(0, 1, 2);
+        for (int row : rowList) {
+            for (int col : colList) {
+                list.add(new int[]{row, col});
+            }
+        }
+        Collections.shuffle(list);
+    }
+
+    @Override
+    public int[] getPosition(ClientService currentPlayer) throws RemoteException {
+        int i = 0;
+        int[] component = list.get(i);
+        while (!this.isValidMove(component[0], component[1])) {
+            i++;
+            list.remove(component);
+            component = list.get(i);
+        }
+        return component;
+    }
+
 }
 
