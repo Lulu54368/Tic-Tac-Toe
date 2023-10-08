@@ -9,7 +9,6 @@ import static client.ClientGui.getClientGUI;
 import static client.StartGUI.getStartGUI;
 
 public class ClientServiceImpl implements ClientService {
-    private static char[][] board = new char[3][3];
     Player currentPlayer;
     ITicTacToeGame game;
     Counter counter;

@@ -74,16 +74,11 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
     }
 
     @Override
-    public synchronized void quitGame() {
-        try {
-            if (!gameFinished) {
-                gameFinished = true;
-            }
-            player1.showHomePage();
-            player2.showHomePage();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void quitGame() {
+        if (!gameFinished) {
+            gameFinished = true;
         }
+
     }
 
     @Override

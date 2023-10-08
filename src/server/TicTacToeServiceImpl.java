@@ -142,6 +142,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         Thread winThread = new Thread(() -> {
             try {
                 winnerPlayer.getResult(Result.WIN, winnerPlayer.getCurrentPlayer().getUsername());
+                winnerPlayer.showHomePage();
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
@@ -149,12 +150,20 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         Thread loseThread = new Thread(() -> {
             try {
                 losePlayer.getResult(Result.WIN, winnerPlayer.getCurrentPlayer().getUsername());
+                losePlayer.showHomePage();
             } catch (RemoteException e) {
                 throw new RuntimeException(e);
             }
         });
         winThread.start();
         loseThread.start();
+        /*try {
+            winThread.join();
+            loseThread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }*/
+
         endGame(game);
     }
 

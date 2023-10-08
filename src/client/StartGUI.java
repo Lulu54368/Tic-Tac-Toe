@@ -10,7 +10,7 @@ import static client.ClientGui.getClientGUI;
 public class StartGUI extends JFrame {
     private static final String LOADING_SERVER = "Loading the server ...";
     private static StartGUI startGUI;
-    private final String WAITING_MATCHING = "Please wait for a match...";
+    private final String WAITING_MATCHING = "Finding Player...";
     private final String ENTER_INPUT = "Please make a choice...";
     private JPanel homePagePanel;
     private JTextField message;

@@ -8,10 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static client.StartGUI.getStartGUI;
@@ -191,7 +188,7 @@ public class ClientGui extends JFrame {
 
 
     public void showResult(String result) {
-        JOptionPane.showMessageDialog(ClientGui.this, result);
+        JOptionPane.showMessageDialog(null, result, "result", JOptionPane.INFORMATION_MESSAGE);
 
     }
 
