@@ -157,13 +157,6 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         });
         winThread.start();
         loseThread.start();
-        /*try {
-            winThread.join();
-            loseThread.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/
-
         endGame(game);
     }
 
@@ -173,6 +166,18 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         int[] component = game.getPosition(currentPlayer);
         currentPlayer.play(component[0], component[1]);
         return component;
+    }
+
+    @Override
+    public void unRegisterPlayer(ClientService clientService) throws RemoteException {
+        //should remove the player from the waiting list
+        TicTacToeGame game = getGameByPlayer(clientService);
+        if (game != null) {
+            ClientService anotherPlayer = getAnotherPlayer(game, clientService);
+            anotherPlayer.showHomePage();
+            endGame(game);
+        } else
+            waitingPlayers.remove(clientService);
     }
 
 

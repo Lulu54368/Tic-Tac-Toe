@@ -3,6 +3,8 @@ package client;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
 
 import static client.ClientGui.getClientGUI;
@@ -42,6 +44,30 @@ public class StartGUI extends JFrame {
                 System.exit(1);
             }
         });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int response = JOptionPane.showConfirmDialog(null,
+                        "Do you want to exit?", "Confirm exit", JOptionPane.YES_NO_OPTION);
+                try {
+                    clientService.unRegisterPlayer();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+                if (response == JOptionPane.NO_OPTION) {
+                    try {
+                        clientService.registerPlayer();
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                if (response == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+        });
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // Prevent the default close operation
     }
 
     public static StartGUI getStartGUI(ClientService clientService) {

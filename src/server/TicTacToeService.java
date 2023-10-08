@@ -21,4 +21,6 @@ public interface TicTacToeService extends Remote {
     void lose(ClientService losePlayer) throws RemoteException;
 
     int[] playInRandomPosition(ClientService currentPlayer) throws RemoteException;
+
+    void unRegisterPlayer(ClientService clientService) throws RemoteException;
 }

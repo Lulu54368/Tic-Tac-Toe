@@ -44,4 +44,6 @@ public interface ClientService extends Remote {
     void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
 
     boolean isFinished() throws RemoteException;
+
+    void unRegisterPlayer() throws RemoteException;
 }

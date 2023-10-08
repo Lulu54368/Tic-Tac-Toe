@@ -8,7 +8,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import static client.StartGUI.getStartGUI;
@@ -113,20 +116,19 @@ public class ClientGui extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // Handle close event here
-                // You can perform cleanup or confirmation actions before closing the window.
-                // For example, you can ask the user if they really want to exit.
                 int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
                 if (response == JOptionPane.YES_OPTION) {
                     // Close the window
                     try {
                         clientService.quit();
+                        System.exit(0);
                     } catch (RemoteException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
             }
         });
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 
     }

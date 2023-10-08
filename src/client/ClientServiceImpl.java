@@ -62,8 +62,6 @@ public class ClientServiceImpl implements ClientService {
             getClientGUI(this).showResult("It is a draw!");
         } else if (result == Result.RETRY) {
             getClientGUI(this).play();
-        } else if (result == Result.END) {
-            System.out.println("The play end!");
         }
 
     }
@@ -150,5 +148,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public boolean isFinished() {
         return isFinished;
+    }
+
+    @Override
+    public void unRegisterPlayer() throws RemoteException {
+        server.unRegisterPlayer(this);
     }
 }
