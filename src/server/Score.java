@@ -24,6 +24,7 @@ public class Score {
     }
 
     public static int getRank(String username) {
+        scoreMap.entrySet().stream().forEach(e->System.out.println(e.getKey()+ " " + e.getValue()));
         return scoreMap
                 .entrySet()
                 .stream()

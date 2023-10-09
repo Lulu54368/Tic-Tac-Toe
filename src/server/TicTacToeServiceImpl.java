@@ -38,9 +38,11 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
             lose(competitor);
         } else if (result == Result.DRAW) {
             Score.draw(clientService.getCurrentPlayer().getUsername());
+            Score.draw(competitor.getCurrentPlayer().getUsername());
             new Thread(() -> {
                 try {
                     clientService.getResult(Result.DRAW);
+                    clientService.showHomePage();
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -49,6 +51,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
             new Thread(() -> {
                 try {
                     competitor.getResult(Result.DRAW);
+                    competitor.showHomePage();
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -159,6 +162,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         loseThread.start();
         endGame(game);
     }
+
 
     @Override
     public int[] playInRandomPosition(ClientService currentPlayer) throws RemoteException {
