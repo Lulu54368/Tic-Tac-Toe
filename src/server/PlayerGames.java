@@ -30,7 +30,6 @@ public class PlayerGames {
     }
 
     public static void putClientGameEntry(TicTacToeGame ticTacToeGame, ClientService clientService) throws RemoteException {
-        System.out.println("put " + clientService + " game " + ticTacToeGame);
         playerGame.put(clientService, ticTacToeGame);
     }
 

@@ -59,6 +59,7 @@ public class StartGUI extends JFrame {
                     try {
                         clientService.registerPlayer();
                     } catch (RemoteException ex) {
+                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }

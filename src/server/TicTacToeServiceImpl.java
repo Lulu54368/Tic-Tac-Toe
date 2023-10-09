@@ -44,6 +44,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                     clientService.getResult(Result.DRAW);
                     clientService.showHomePage();
                 } catch (RemoteException e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }).start();
@@ -53,6 +54,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                     competitor.getResult(Result.DRAW);
                     competitor.showHomePage();
                 } catch (RemoteException e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }).start();
@@ -85,11 +87,10 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
 
     private void tryMatchPlayers() {
         executorService.submit(() -> {
-            //TODO: assign player randomly
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-                //TODO: handle exception
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
             Collections.shuffle((LinkedList) waitingPlayers);
@@ -110,7 +111,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                 try {
                     game.start();
                 } catch (RemoteException e) {
-                    //TODO: handle exception
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }

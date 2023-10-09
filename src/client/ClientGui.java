@@ -94,7 +94,7 @@ public class ClientGui extends JFrame {
                         disableButton();
                         clientService.play(row, col);
                     } catch (RemoteException ex) {
-                        //TODO: handle exception
+                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }
@@ -108,6 +108,7 @@ public class ClientGui extends JFrame {
                     try {
                         clientService.quit();
                     } catch (RemoteException ex) {
+                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }
@@ -118,11 +119,11 @@ public class ClientGui extends JFrame {
             public void windowClosing(WindowEvent e) {
                 int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?");
                 if (response == JOptionPane.YES_OPTION) {
-                    // Close the window
                     try {
                         clientService.quit();
                         System.exit(0);
                     } catch (RemoteException ex) {
+                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }

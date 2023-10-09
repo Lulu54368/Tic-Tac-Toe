@@ -24,14 +24,14 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         player1.setGame(this);
         player2.setGame(this);
         initiateBoard();
-        System.out.println("game in both player" + String.valueOf(player1.getGame() == player2.getGame()));
     }
 
 
     public void start() throws RemoteException {
-        //TODO: choosing symbol randomly
-        player1.getCurrentPlayer().setSymbol('X');
-        player2.getCurrentPlayer().setSymbol('O');
+        List<Character> symbols = Arrays.asList('X', 'O');
+        Collections.shuffle(symbols);
+        player1.getCurrentPlayer().setSymbol(symbols.get(0));
+        player2.getCurrentPlayer().setSymbol(symbols.get(1));
         gameFinished = false;
         MessageBroker messageBroker = new MessageBrokerImpl();
         player1.setMessageBroker(messageBroker);
