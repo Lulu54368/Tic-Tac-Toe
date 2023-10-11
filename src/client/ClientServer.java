@@ -33,7 +33,7 @@ public class ClientServer {
             clientService.registerPlayer();
             getClientGUI(clientService).startGame(username, clientService.currentPlayer.getRank());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Unable to register the player");
             System.exit(-1);
         }
         checkStatus();
@@ -70,7 +70,6 @@ public class ClientServer {
                         try {
                             //try to connect to the server
                             connectServer();
-                            //TODO: end the game as a tie
                             getClientGUI(clientService).clear();
                             getStartGUI(clientService).showHomePage();
                         } catch (Exception exc) {

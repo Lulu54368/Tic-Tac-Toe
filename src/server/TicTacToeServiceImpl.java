@@ -104,7 +104,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                     putClientGameEntry(game, player1);
                     putClientGameEntry(game, player2);
                 } catch (RemoteException e) {
-                    //TODO: handle exception
+                    System.err.println("Unable to create a new game");
                     throw new RuntimeException(e);
                 }
                 activeGames.add(game);

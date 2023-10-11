@@ -21,7 +21,7 @@ public class Player implements IPlayer, Serializable {
     }
 
     @Override
-    public void setSymbol(char symbol) throws RemoteException {
+    public synchronized void setSymbol(char symbol) throws RemoteException {
         this.symbol = symbol;
     }
 
@@ -36,7 +36,7 @@ public class Player implements IPlayer, Serializable {
     }
 
     @Override
-    public void setRank(int rank) throws RemoteException {
+    public synchronized void setRank(int rank) throws RemoteException {
         this.rank = rank;
     }
 

@@ -40,7 +40,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
             try {
                 player1.startGame(player1.getCurrentPlayer(), true);
             } catch (RemoteException e) {
-                //TODO: handle exception
+                System.err.println("Unable to start the game");
                 throw new RuntimeException(e);
             }
         }).start();

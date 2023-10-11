@@ -44,7 +44,7 @@ public class Counter extends TimerTask implements Serializable {
             try {
                 currentPlayer.sendTime(time);
             } catch (RemoteException e) {
-                //TODO: handle exception
+                System.err.println("Unable to send time");
                 throw new RuntimeException(e);
             }
             time--;

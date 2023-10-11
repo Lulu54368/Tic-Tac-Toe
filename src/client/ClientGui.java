@@ -94,7 +94,6 @@ public class ClientGui extends JFrame {
                         disableButton();
                         clientService.play(row, col);
                     } catch (RemoteException ex) {
-                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }
@@ -108,7 +107,6 @@ public class ClientGui extends JFrame {
                     try {
                         clientService.quit();
                     } catch (RemoteException ex) {
-                        ex.printStackTrace();
                         throw new RuntimeException(ex);
                     }
                 }
