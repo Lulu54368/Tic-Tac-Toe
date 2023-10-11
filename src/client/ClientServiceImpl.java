@@ -104,7 +104,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void sendMessage(String message) throws RemoteException {
-        //TODO: should refer to the same game object
         server.sendMessage(this, message, currentPlayer);
     }
 
