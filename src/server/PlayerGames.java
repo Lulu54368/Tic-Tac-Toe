@@ -4,34 +4,69 @@ import client.ClientService;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
+/**
+ * @author lulu
+ */
 public class PlayerGames {
-    private static HashMap<ClientService, TicTacToeGame> playerGame = new HashMap<>();
+    private static HashMap<TicTacToeGame, List<String>> playerGame = new HashMap<>();
+    private static HashMap<String, ClientService> activePlayer = new HashMap<>();
 
-    public static TicTacToeGame getGameByPlayer(ClientService clientService) {
-        return playerGame.get(clientService);
-    }
-
-    public static ClientService getAnotherPlayer(TicTacToeGame ticTacToeGame, ClientService player) {
+    public static TicTacToeGame getGameByPlayer(ClientService clientService) throws RemoteException {
+        String username = clientService.getCurrentPlayer().getUsername();
         return playerGame.entrySet()
                 .stream()
-                .filter(e -> e.getValue().equals(ticTacToeGame))
-                .map(e -> e.getKey())
-                .filter(p -> !p.equals(player))
+                .filter(e -> e.getValue().contains(username))
                 .findFirst()
-                .get();
+                .get()
+                .getKey();
+    }
+
+    public static ClientService getAnotherPlayer(TicTacToeGame ticTacToeGame, ClientService player) throws RemoteException {
+        for (String username : playerGame.get(ticTacToeGame)) {
+            if (!username.equals(player.getCurrentPlayer().getUsername())) {
+                return activePlayer.get(username);
+            }
+        }
+        return null;
     }
 
     public static void removeClientServiceByGame(TicTacToeGame game) {
-        playerGame.entrySet()
-                .stream()
-                .filter(e -> e.getValue().equals(game))
-                .map(e -> playerGame.remove(e.getKey(), game));
+        List<String> players = playerGame.get(game);
+        players.stream().forEach(player -> activePlayer.remove(player));
+        playerGame.remove(game);
     }
 
     public static void putClientGameEntry(TicTacToeGame ticTacToeGame, ClientService clientService) throws RemoteException {
-        playerGame.put(clientService, ticTacToeGame);
+        if (!playerGame.containsKey(ticTacToeGame)) {
+            playerGame.put(ticTacToeGame, new LinkedList<>());
+        }
+        List<String> players = playerGame.get(ticTacToeGame);
+        if (!players.contains(clientService.getCurrentPlayer().getUsername())) {
+            players.add(clientService.getCurrentPlayer().getUsername());
+            playerGame.put(ticTacToeGame, players);
+        }
+        activePlayer.put(clientService.getCurrentPlayer().getUsername(), clientService);
+    }
+
+    public static boolean isActivePlayer(ClientService clientService) throws RemoteException {
+        String username = clientService.getCurrentPlayer().getUsername();
+        if (activePlayer.containsKey(username)) {
+            activePlayer.remove(username);
+            activePlayer.put(username, clientService);
+            return true;
+        }
+        return false;
+    }
+
+    public static HashMap<String, ClientService> getActivePlayer() {
+        return activePlayer;
     }
 
 
+    public static ClientService getClientByUsername(String username) {
+        return activePlayer.get(username);
+    }
 }

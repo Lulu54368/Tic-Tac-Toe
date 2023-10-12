@@ -8,6 +8,9 @@ import java.rmi.server.UnicastRemoteObject;
 import static client.ClientGui.getClientGUI;
 import static client.StartGUI.getStartGUI;
 
+/**
+ * @author lulu
+ */
 public class ClientServiceImpl implements ClientService {
     Player currentPlayer;
     ITicTacToeGame game;
@@ -152,5 +155,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void unRegisterPlayer() throws RemoteException {
         server.unRegisterPlayer(this);
+    }
+
+    @Override
+    public String pong() throws RemoteException {
+        return "OK";
     }
 }

@@ -11,8 +11,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static client.ClientGui.getClientGUI;
-import static client.StartGUI.getStartGUI;
 
+/**
+ * @author lulu
+ */
 public class ClientServer {
     private static Integer portNumber;
     private static String ip;
@@ -48,41 +50,24 @@ public class ClientServer {
     }
 
     private static void checkStatus() {
-        try {
-            ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-            Runnable checkServerStatus = () -> {
-                try {
-                    // check the server status every 1 sec
-                    server.pong();
-                } catch (Exception e) {
-                    try {
-                        getClientGUI(clientService).setVisible(false);
-                        getStartGUI(clientService).loadServer();
-                        Thread.sleep(5000);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    try {
-                        //check the connection after 5 sc
-                        server.pong();
-                        getClientGUI(clientService).resume();
-                    } catch (RemoteException ex) {
-                        try {
-                            //try to connect to the server
-                            connectServer();
-                            getClientGUI(clientService).clear();
-                            getStartGUI(clientService).showHomePage();
-                        } catch (Exception exc) {
-                            System.exit(0);
-                        }
-                    }
-                }
-            };
-            executorService.scheduleAtFixedRate(checkServerStatus, 0, 1000, TimeUnit.MILLISECONDS);
 
-        } catch (Exception e) {
-            System.exit(0);
-        }
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        Runnable checkServerStatus = () -> {
+            try {
+                // check the server status every 1 sec
+                server.pong();
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.exit(0);
+            }
+        };
+        executorService.scheduleAtFixedRate(checkServerStatus, 0, 1000, TimeUnit.MILLISECONDS);
+
+
     }
 
 

@@ -7,6 +7,9 @@ import server.MessageBroker;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+/**
+ * @author lulu
+ */
 public interface ClientService extends Remote {
     public void registerPlayer() throws RemoteException;
 
@@ -46,4 +49,6 @@ public interface ClientService extends Remote {
     boolean isFinished() throws RemoteException;
 
     void unRegisterPlayer() throws RemoteException;
+
+    String pong() throws RemoteException;
 }

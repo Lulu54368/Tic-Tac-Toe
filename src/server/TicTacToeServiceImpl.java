@@ -11,9 +11,15 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import static client.StartGUI.getStartGUI;
 import static server.PlayerGames.*;
 
+/**
+ * @author lulu
+ */
 public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacToeService {
     private Queue<ClientService> waitingPlayers = new LinkedList<>();
     private ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -22,6 +28,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
 
     public TicTacToeServiceImpl() throws RemoteException {
         super();
+        checkStatus();
     }
 
 
@@ -80,9 +87,15 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         Score.createNew(clientService.getCurrentPlayer().getUsername());
         int rank = Score.getRank(clientService.getCurrentPlayer().getUsername());
         clientService.getCurrentPlayer().setRank(rank);
-        waitingPlayers.offer(clientService);
-        System.out.println("Player " + clientService.getCurrentPlayer().getUsername() + " registered.");
-        tryMatchPlayers();
+        if (!PlayerGames.isActivePlayer(clientService)) {
+            waitingPlayers.offer(clientService);
+            System.out.println("Player " + clientService.getCurrentPlayer().getUsername() + " registered.");
+            tryMatchPlayers();
+        } else {
+            getStartGUI(clientService).setVisible(false);
+            clientService.play();
+        }
+
     }
 
     private void tryMatchPlayers() {
@@ -183,6 +196,37 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
             endGame(game);
         } else
             waitingPlayers.remove(clientService);
+    }
+
+    private void checkStatus() {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        Runnable checkServerStatus = () -> {
+            PlayerGames.getActivePlayer()
+                    .entrySet()
+                    .parallelStream()
+                    .forEach(e -> {
+                        try {
+                            e.getValue().pong();
+                        } catch (RemoteException ex) {
+                            //pause the game for 30 seconds
+                            for (int i = 0; i < 30; i++) {
+                                ClientService newClientService = PlayerGames.getClientByUsername(e.getKey());
+                                try {
+                                    newClientService.pong();
+                                    Thread.sleep(1000);
+                                    break;
+                                } catch (RemoteException exc) {
+                                    continue;
+                                } catch (InterruptedException exception) {
+                                    throw new RuntimeException(exception);
+                                }
+                            }
+                            System.out.println("game paused");
+                        }
+                    });
+        };
+        executorService.scheduleAtFixedRate(checkServerStatus, 0, 1000, TimeUnit.MILLISECONDS);
+
     }
 
 

@@ -9,6 +9,9 @@ import java.util.TimerTask;
 
 import static client.ClientGui.getClientGUI;
 
+/**
+ * @author lulu
+ */
 public class Counter extends TimerTask implements Serializable {
 
     int time = 20;

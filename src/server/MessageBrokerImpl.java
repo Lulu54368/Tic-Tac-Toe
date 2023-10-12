@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * @author lulu
+ */
 public class MessageBrokerImpl implements MessageBroker, Serializable {
     private Queue<Map<IPlayer, String>> messageQueue = new LinkedList<>();
 

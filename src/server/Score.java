@@ -4,6 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author lulu
+ */
 public class Score {
     private static Map<String, Integer> scoreMap = new LinkedHashMap<>();
 

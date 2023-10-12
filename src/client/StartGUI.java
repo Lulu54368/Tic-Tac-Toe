@@ -9,6 +9,9 @@ import java.rmi.RemoteException;
 
 import static client.ClientGui.getClientGUI;
 
+/**
+ * @author lulu
+ */
 public class StartGUI extends JFrame {
     private static final String LOADING_SERVER = "Server unavailable";
     private static StartGUI startGUI;

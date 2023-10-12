@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 
 import static client.StartGUI.getStartGUI;
 
+/**
+ * @author lulu
+ */
 public class ClientGui extends JFrame {
     private static ClientGui clientGui;
     private JTextArea timer;

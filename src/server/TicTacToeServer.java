@@ -5,6 +5,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * @author lulu
+ */
 public class TicTacToeServer {
     private static int portNumber;
     private static String ip;

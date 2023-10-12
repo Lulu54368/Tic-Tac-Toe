@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author lulu
+ */
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
     List<int[]> list = new LinkedList<>();
     private ClientService player1;

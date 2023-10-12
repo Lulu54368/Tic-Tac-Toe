@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * @author lulu
+ */
 public class Player implements IPlayer, Serializable {
     int rank;
     String username;

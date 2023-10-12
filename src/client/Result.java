@@ -2,6 +2,9 @@ package client;
 
 import java.io.Serializable;
 
+/**
+ * @author lulu
+ */
 public enum Result implements Serializable {
 
     WIN("wins"),
