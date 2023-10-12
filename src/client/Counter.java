@@ -24,6 +24,9 @@ public class Counter extends TimerTask implements Serializable {
         this.ticTacToeService = ticTacToeService;
     }
 
+    public void setCurrentPlayer(ClientService currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
 
     @Override
     public void run() {
@@ -64,5 +67,10 @@ public class Counter extends TimerTask implements Serializable {
     public boolean cancel() {
         timer.cancel();
         return true;
+    }
+
+    public void sleep() throws InterruptedException {
+        timer.cancel();
+        Thread.sleep(10000);
     }
 }

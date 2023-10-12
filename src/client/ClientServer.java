@@ -50,7 +50,6 @@ public class ClientServer {
     }
 
     private static void checkStatus() {
-
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         Runnable checkServerStatus = () -> {
             try {

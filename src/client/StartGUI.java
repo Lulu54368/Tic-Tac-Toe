@@ -21,7 +21,7 @@ public class StartGUI extends JFrame {
     private JTextField message;
     private JButton quitButton;
     private JButton startButton;
-    private ClientService clientService;
+    private final ClientService clientService;
 
     private StartGUI(ClientService clientService) {
         initialiseGUI();

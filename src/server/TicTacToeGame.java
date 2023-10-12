@@ -5,32 +5,31 @@ import client.Result;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author lulu
  */
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
     List<int[]> list = new LinkedList<>();
-    private ClientService player1;
-    private ClientService player2;
-    private char[][] board;
+    private final String user1;
+    private final String user2;
+    private final char[][] board;
     private boolean gameFinished;
+    private String currentPlayer;
+    private final HashMap<Character, String> symbolUsername = new HashMap<>();
 
-    public TicTacToeGame(ClientService player1, ClientService player2) throws RemoteException {
-        this.player1 = player1;
-        this.player2 = player2;
+    public TicTacToeGame(String user1, String user2) throws RemoteException {
+        this.user1 = user1;
+        this.user2 = user2;
         this.board = new char[3][3];
-        player1.setGame(this);
-        player2.setGame(this);
         initiateBoard();
     }
 
 
     public void start() throws RemoteException {
+        ClientService player1 = PlayerGames.getClientByUsername(user1);
+        ClientService player2 = PlayerGames.getClientByUsername(user2);
         List<Character> symbols = Arrays.asList('X', 'O');
         Collections.shuffle(symbols);
         player1.getCurrentPlayer().setSymbol(symbols.get(0));
@@ -39,8 +38,11 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         MessageBroker messageBroker = new MessageBrokerImpl();
         player1.setMessageBroker(messageBroker);
         player2.setMessageBroker(messageBroker);
+        symbolUsername.put(symbols.get(0), player1.getCurrentPlayer().getUsername());
+        symbolUsername.put(symbols.get(1), player1.getCurrentPlayer().getUsername());
         new Thread(() -> {
             try {
+                currentPlayer = player1.getCurrentPlayer().getUsername();
                 player1.startGame(player1.getCurrentPlayer(), true);
             } catch (RemoteException e) {
                 System.err.println("Unable to start the game");
@@ -67,6 +69,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
                     gameFinished = true;
                     return Result.DRAW;
                 } else {
+                    currentPlayer = symbolUsername.get(symbol == 'O' ? 'X' : 'O');
                     return Result.CONTINUE;
                 }
             } else {
@@ -100,12 +103,9 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
             return true;
         }
         // Check diagonals
-        if ((row == col || row + col == 2) &&
+        return (row == col || row + col == 2) &&
                 ((board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol) ||
-                        (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol))) {
-            return true;
-        }
-        return false;
+                        (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol));
     }
 
     private boolean isBoardFull() {
@@ -142,5 +142,34 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         return component;
     }
 
+    public void pause() throws InterruptedException {
+        if (!gameFinished) {
+            ClientService player1 = PlayerGames.getClientByUsername(user1);
+            ClientService player2 = PlayerGames.getClientByUsername(user2);
+            try {
+                player1.pause();
+                player2.pause();
+            } catch (RemoteException e) {
+                return;
+            }
+            Thread.sleep(30000);
+        }
+
+    }
+
+    public void resume() {
+        if (!gameFinished) {
+            ClientService player1 = PlayerGames.getClientByUsername(user1);
+            ClientService player2 = PlayerGames.getClientByUsername(user2);
+            try {
+                player1.resume(board, currentPlayer);
+                player2.resume(board, currentPlayer);
+            } catch (RemoteException e) {
+                System.err.println("Unable to resume the client");
+            }
+        }
+
+
+    }
 }
 

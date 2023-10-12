@@ -11,11 +11,10 @@ import java.util.List;
  * @author lulu
  */
 public class PlayerGames {
-    private static HashMap<TicTacToeGame, List<String>> playerGame = new HashMap<>();
-    private static HashMap<String, ClientService> activePlayer = new HashMap<>();
+    private static final HashMap<TicTacToeGame, List<String>> playerGame = new HashMap<>();
+    private static final HashMap<String, ClientService> activePlayer = new HashMap<>();
 
-    public static TicTacToeGame getGameByPlayer(ClientService clientService) throws RemoteException {
-        String username = clientService.getCurrentPlayer().getUsername();
+    public static TicTacToeGame getGameByPlayer(String username) throws RemoteException {
         return playerGame.entrySet()
                 .stream()
                 .filter(e -> e.getValue().contains(username))
@@ -68,5 +67,9 @@ public class PlayerGames {
 
     public static ClientService getClientByUsername(String username) {
         return activePlayer.get(username);
+    }
+
+    public static List<String> getPlayersByGame(TicTacToeGame game) {
+        return playerGame.get(game);
     }
 }

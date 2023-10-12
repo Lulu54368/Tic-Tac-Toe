@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
  * @author lulu
  */
 public class Score {
-    private static Map<String, Integer> scoreMap = new LinkedHashMap<>();
+    private static final Map<String, Integer> scoreMap = new LinkedHashMap<>();
 
     public static void createNew(String username) {
         scoreMap.putIfAbsent(username, 0);
@@ -29,7 +29,7 @@ public class Score {
     public static int getRank(String username) {
         System.out.println("The score for the players");
         scoreMap.entrySet().stream().forEach(e -> System.out.print(e.getKey() + " " + e.getValue()));
-        System.out.println("");
+        System.out.println();
         return scoreMap
                 .entrySet()
                 .stream()

@@ -21,9 +21,9 @@ import static server.PlayerGames.*;
  * @author lulu
  */
 public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacToeService {
-    private Queue<ClientService> waitingPlayers = new LinkedList<>();
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private List<TicTacToeGame> activeGames = new LinkedList<>();
+    private final Queue<ClientService> waitingPlayers = new LinkedList<>();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private final List<TicTacToeGame> activeGames = new LinkedList<>();
 
 
     public TicTacToeServiceImpl() throws RemoteException {
@@ -34,7 +34,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
 
     @Override
     public void addOnBoard(ClientService clientService, int row, int col) throws RemoteException {
-        TicTacToeGame game = getGameByPlayer(clientService);
+        TicTacToeGame game = getGameByPlayer(clientService.getCurrentPlayer().getUsername());
         ClientService competitor = getAnotherPlayer(game, clientService);
         Result result = game.makeMove(row, col, clientService.getCurrentPlayer().getSymbol());
         if (result != Result.RETRY && result != Result.END) {
@@ -44,28 +44,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         if (result == Result.WIN) {
             lose(competitor);
         } else if (result == Result.DRAW) {
-            Score.draw(clientService.getCurrentPlayer().getUsername());
-            Score.draw(competitor.getCurrentPlayer().getUsername());
-            new Thread(() -> {
-                try {
-                    clientService.getResult(Result.DRAW);
-                    clientService.showHomePage();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }).start();
-            Score.draw(competitor.getCurrentPlayer().getUsername());
-            new Thread(() -> {
-                try {
-                    competitor.getResult(Result.DRAW);
-                    competitor.showHomePage();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }).start();
-            endGame(game);
+            draw(game);
         } else if (result == Result.CONTINUE) {
             switchTurn(clientService);
         } else if (result == Result.RETRY) {
@@ -75,7 +54,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
 
     @Override
     public void switchTurn(ClientService player) throws RemoteException {
-        TicTacToeGame ticTacToeGame = getGameByPlayer(player);
+        TicTacToeGame ticTacToeGame = getGameByPlayer(player.getCurrentPlayer().getUsername());
         ClientService competitor = getAnotherPlayer(ticTacToeGame, player);
         player.setTurn(competitor.getCurrentPlayer());
         competitor.play();
@@ -113,7 +92,8 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                 TicTacToeGame game = null;
 
                 try {
-                    game = new TicTacToeGame(player1, player2);
+                    game = new TicTacToeGame(player1.getCurrentPlayer().getUsername(),
+                            player2.getCurrentPlayer().getUsername());
                     putClientGameEntry(game, player1);
                     putClientGameEntry(game, player2);
                 } catch (RemoteException e) {
@@ -147,12 +127,12 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
     @Override
     public void sendMessage(ClientService player, String message, IPlayer currentPlayer) throws RemoteException {
         player.updateMessage(message, currentPlayer);
-        getAnotherPlayer(getGameByPlayer(player), player).updateMessage(message, currentPlayer);
+        getAnotherPlayer(getGameByPlayer(player.getCurrentPlayer().getUsername()), player).updateMessage(message, currentPlayer);
     }
 
     @Override
     public void lose(ClientService losePlayer) throws RemoteException {
-        TicTacToeGame game = PlayerGames.getGameByPlayer(losePlayer);
+        TicTacToeGame game = PlayerGames.getGameByPlayer(losePlayer.getCurrentPlayer().getUsername());
         ClientService winnerPlayer = getAnotherPlayer(game, losePlayer);
         Score.win(winnerPlayer.getCurrentPlayer().getUsername());
         Score.lose(losePlayer.getCurrentPlayer().getUsername());
@@ -177,10 +157,32 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
         endGame(game);
     }
 
+    public void draw(TicTacToeGame game) {
+        getPlayersByGame(game)
+                .stream()
+                .map(user -> {
+                    Score.draw(user);
+                    return getClientByUsername(user);
+                })
+                .forEach(player -> new Thread(() -> {
+                    try {
+                        player.getResult(Result.DRAW);
+                        player.showHomePage();
+                    } catch (RemoteException e) {
+                    }
+                }).start());
+
+        try {
+            endGame(game);
+        } catch (RemoteException e) {
+            System.out.println("issues occurred ending game");
+        }
+    }
+
 
     @Override
     public int[] playInRandomPosition(ClientService currentPlayer) throws RemoteException {
-        TicTacToeGame game = getGameByPlayer(currentPlayer);
+        TicTacToeGame game = getGameByPlayer(currentPlayer.getCurrentPlayer().getUsername());
         int[] component = game.getPosition(currentPlayer);
         currentPlayer.play(component[0], component[1]);
         return component;
@@ -189,7 +191,7 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
     @Override
     public void unRegisterPlayer(ClientService clientService) throws RemoteException {
         //should remove the player from the waiting list
-        TicTacToeGame game = getGameByPlayer(clientService);
+        TicTacToeGame game = getGameByPlayer(clientService.getCurrentPlayer().getUsername());
         if (game != null) {
             ClientService anotherPlayer = getAnotherPlayer(game, clientService);
             anotherPlayer.showHomePage();
@@ -208,20 +210,33 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                         try {
                             e.getValue().pong();
                         } catch (RemoteException ex) {
+                            TicTacToeGame game;
                             //pause the game for 30 seconds
+                            try {
+                                game = PlayerGames.getGameByPlayer(e.getKey());
+                                game.pause();
+                            } catch (RemoteException exc) {
+                                exc.printStackTrace();
+                                throw new RuntimeException(exc);
+                            } catch (InterruptedException exception) {
+                                throw new RuntimeException(exception);
+                            }
                             for (int i = 0; i < 30; i++) {
                                 ClientService newClientService = PlayerGames.getClientByUsername(e.getKey());
                                 try {
-                                    newClientService.pong();
                                     Thread.sleep(1000);
-                                    break;
-                                } catch (RemoteException exc) {
-                                    continue;
+                                    newClientService.pong();
+                                    e.setValue(newClientService);
+                                    game.resume();
+                                    return;
                                 } catch (InterruptedException exception) {
                                     throw new RuntimeException(exception);
+                                } catch (RemoteException exception) {
+                                    continue;
                                 }
                             }
-                            System.out.println("game paused");
+                            //draw and end
+                            draw(game);
                         }
                     });
         };

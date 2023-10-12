@@ -1,7 +1,6 @@
 package client;
 
 import server.IPlayer;
-import server.ITicTacToeGame;
 import server.MessageBroker;
 
 import java.rmi.Remote;
@@ -11,7 +10,7 @@ import java.rmi.RemoteException;
  * @author lulu
  */
 public interface ClientService extends Remote {
-    public void registerPlayer() throws RemoteException;
+    void registerPlayer() throws RemoteException;
 
     void startGame(IPlayer currentPlayer, boolean isFirst) throws RemoteException;
 
@@ -34,9 +33,6 @@ public interface ClientService extends Remote {
 
     void sendMessage(String message) throws RemoteException;
 
-    ITicTacToeGame getGame() throws RemoteException;
-
-    void setGame(ITicTacToeGame game) throws RemoteException;
 
     void play() throws RemoteException;
 
@@ -46,9 +42,12 @@ public interface ClientService extends Remote {
 
     void setMessageBroker(MessageBroker messageBroker) throws RemoteException;
 
-    boolean isFinished() throws RemoteException;
 
     void unRegisterPlayer() throws RemoteException;
 
     String pong() throws RemoteException;
+
+    void pause() throws RemoteException;
+
+    void resume(char[][] board, String currentPlayer) throws RemoteException;
 }

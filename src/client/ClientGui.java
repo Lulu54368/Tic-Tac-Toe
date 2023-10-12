@@ -37,8 +37,8 @@ public class ClientGui extends JFrame {
     private JPanel clientPanel;
     private JTextField username;
     private JButton sendButton;
-    private ClientService clientService;
-    private List<JButton> jButtons = Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
+    private final ClientService clientService;
+    private final List<JButton> jButtons = Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
 
     private ClientGui(ClientService clientService) {
         initialiseGUI();
@@ -206,11 +206,22 @@ public class ClientGui extends JFrame {
         setVisible(false);
     }
 
-    public void resume() throws RemoteException {
-        if (!clientService.isFinished()) {
-            setVisible(true);
-            getStartGUI(clientService).setVisible(false);
+    public void resume(char[][] board, boolean flag) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int ind = i * 3 + j;
+                jButtons.get(ind).setText(String.valueOf(board[i][j]));
+            }
         }
+        System.out.println(flag);
+        if (flag) {
+            enableButton();
+        } else {
+            disableButton();
+        }
+        setVisible(true);
+        getStartGUI(clientService).setVisible(false);
+
     }
 
     public void notify(String s) {

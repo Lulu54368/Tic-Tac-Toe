@@ -1,6 +1,9 @@
 package client;
 
-import server.*;
+import server.IPlayer;
+import server.MessageBroker;
+import server.Player;
+import server.TicTacToeService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -13,12 +16,9 @@ import static client.StartGUI.getStartGUI;
  */
 public class ClientServiceImpl implements ClientService {
     Player currentPlayer;
-    ITicTacToeGame game;
     Counter counter;
     MessageBroker messageBroker;
-    private TicTacToeService server;
-
-    private boolean isFinished = true;
+    private final TicTacToeService server;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
@@ -27,7 +27,6 @@ public class ClientServiceImpl implements ClientService {
         UnicastRemoteObject
                 .exportObject(this, 0);
         getStartGUI(this);
-        isFinished = true;
 
     }
 
@@ -39,7 +38,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void startGame(IPlayer currentPlayer, boolean isFirst) throws RemoteException {
         getStartGUI(this).startGame();
-        isFinished = false;
         if (isFirst) {
             play();
         } else {
@@ -61,7 +59,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void getResult(Result result) throws RemoteException {
         if (result == Result.DRAW) {
-            isFinished = true;
             getClientGUI(this).showResult("It is a draw!");
         } else if (result == Result.RETRY) {
             getClientGUI(this).play();
@@ -72,7 +69,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void getResult(Result result, String username) throws RemoteException {
         if (result == Result.WIN) {
-            isFinished = true;
             getClientGUI(this).showResult(username + " win!");
         }
 
@@ -110,16 +106,6 @@ public class ClientServiceImpl implements ClientService {
         server.sendMessage(this, message, currentPlayer);
     }
 
-    @Override
-    public ITicTacToeGame getGame() throws RemoteException {
-        return game;
-    }
-
-    @Override
-    public void setGame(ITicTacToeGame game) throws RemoteException {
-        this.game = game;
-    }
-
 
     @Override
     public void play() throws RemoteException {
@@ -132,7 +118,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void quit() throws RemoteException {
         server.lose(this);
-        isFinished = true;
     }
 
     @Override
@@ -148,11 +133,6 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public boolean isFinished() {
-        return isFinished;
-    }
-
-    @Override
     public void unRegisterPlayer() throws RemoteException {
         server.unRegisterPlayer(this);
     }
@@ -160,5 +140,24 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public String pong() throws RemoteException {
         return "OK";
+    }
+
+    @Override
+    public void pause() throws RemoteException {
+        try {
+            counter.sleep();
+            getClientGUI(this).disableButton();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void resume(char[][] board, String currentPlayer) throws RemoteException {
+        boolean flag = false;
+        counter.setCurrentPlayer(this);
+        if (currentPlayer.equals(this.currentPlayer.getUsername()))
+            flag = true;
+        getClientGUI(this).resume(board, flag);
     }
 }
