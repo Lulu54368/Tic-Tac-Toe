@@ -69,8 +69,4 @@ public class Counter extends TimerTask implements Serializable {
         return true;
     }
 
-    public void sleep() throws InterruptedException {
-        timer.cancel();
-        Thread.sleep(10000);
-    }
 }

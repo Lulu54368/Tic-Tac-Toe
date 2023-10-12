@@ -11,13 +11,13 @@ import java.util.*;
  * @author lulu
  */
 public class TicTacToeGame implements Serializable, ITicTacToeGame {
-    List<int[]> list = new LinkedList<>();
     private final String user1;
     private final String user2;
     private final char[][] board;
+    private final HashMap<Character, String> symbolUsername = new HashMap<>();
+    List<int[]> list = new LinkedList<>();
     private boolean gameFinished;
     private String currentPlayer;
-    private final HashMap<Character, String> symbolUsername = new HashMap<>();
 
     public TicTacToeGame(String user1, String user2) throws RemoteException {
         this.user1 = user1;
@@ -142,7 +142,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
         return component;
     }
 
-    public void pause() throws InterruptedException {
+    public void pause() {
         if (!gameFinished) {
             ClientService player1 = PlayerGames.getClientByUsername(user1);
             ClientService player2 = PlayerGames.getClientByUsername(user2);
@@ -150,9 +150,12 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
                 player1.pause();
                 player2.pause();
             } catch (RemoteException e) {
-                return;
             }
-            Thread.sleep(30000);
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                resume();
+            }
         }
 
     }

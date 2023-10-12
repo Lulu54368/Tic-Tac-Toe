@@ -218,8 +218,6 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                             } catch (RemoteException exc) {
                                 exc.printStackTrace();
                                 throw new RuntimeException(exc);
-                            } catch (InterruptedException exception) {
-                                throw new RuntimeException(exception);
                             }
                             for (int i = 0; i < 30; i++) {
                                 ClientService newClientService = PlayerGames.getClientByUsername(e.getKey());
@@ -235,7 +233,6 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                                     continue;
                                 }
                             }
-                            //draw and end
                             draw(game);
                         }
                     });

@@ -21,6 +21,7 @@ import static client.StartGUI.getStartGUI;
  */
 public class ClientGui extends JFrame {
     private static ClientGui clientGui;
+    private final ClientService clientService;
     private JTextArea timer;
     private JTextPane playerchat;
     private JButton button1;
@@ -32,13 +33,12 @@ public class ClientGui extends JFrame {
     private JButton button7;
     private JButton button8;
     private JButton button9;
+    private final List<JButton> jButtons = Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
     private JTextArea playerContent;
     private JButton quit;
     private JPanel clientPanel;
     private JTextField username;
     private JButton sendButton;
-    private final ClientService clientService;
-    private final List<JButton> jButtons = Arrays.asList(button1, button2, button3, button4, button5, button6, button7, button8, button9);
 
     private ClientGui(ClientService clientService) {
         initialiseGUI();
@@ -213,15 +213,14 @@ public class ClientGui extends JFrame {
                 jButtons.get(ind).setText(String.valueOf(board[i][j]));
             }
         }
-        System.out.println(flag);
+        System.out.println("set visible");
+        setVisible(true);
+        getStartGUI(clientService).setVisible(false);
         if (flag) {
             enableButton();
         } else {
             disableButton();
         }
-        setVisible(true);
-        getStartGUI(clientService).setVisible(false);
-
     }
 
     public void notify(String s) {

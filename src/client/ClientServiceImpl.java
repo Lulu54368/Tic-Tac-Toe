@@ -15,10 +15,11 @@ import static client.StartGUI.getStartGUI;
  * @author lulu
  */
 public class ClientServiceImpl implements ClientService {
+    private final TicTacToeService server;
     Player currentPlayer;
     Counter counter;
     MessageBroker messageBroker;
-    private final TicTacToeService server;
+    int time;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
@@ -143,21 +144,22 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void pause() throws RemoteException {
-        try {
-            counter.sleep();
-            getClientGUI(this).disableButton();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public void pause() {
+        counter.cancel();
+        getClientGUI(this).disableButton();
     }
 
     @Override
     public void resume(char[][] board, String currentPlayer) throws RemoteException {
         boolean flag = false;
         counter.setCurrentPlayer(this);
-        if (currentPlayer.equals(this.currentPlayer.getUsername()))
+        if (currentPlayer.equals(this.currentPlayer.getUsername())) {
             flag = true;
+            counter.run();
+        } else {
+            counter.cancel();
+        }
         getClientGUI(this).resume(board, flag);
+
     }
 }

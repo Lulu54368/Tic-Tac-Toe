@@ -17,11 +17,11 @@ public class StartGUI extends JFrame {
     private static StartGUI startGUI;
     private final String WAITING_MATCHING = "Finding Player...";
     private final String ENTER_INPUT = "Please make a choice...";
+    private final ClientService clientService;
     private JPanel homePagePanel;
     private JTextField message;
     private JButton quitButton;
     private JButton startButton;
-    private final ClientService clientService;
 
     private StartGUI(ClientService clientService) {
         initialiseGUI();
