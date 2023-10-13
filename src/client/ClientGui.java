@@ -44,29 +44,6 @@ public class ClientGui extends JFrame {
         initialiseGUI();
         disableButton();
         this.clientService = clientService;
-    }
-
-    public static ClientGui getClientGUI(ClientService clientService) {
-        if (clientGui == null) {
-            clientGui = new ClientGui(clientService);
-        }
-        return clientGui;
-    }
-
-    private void initialiseGUI() {
-        setContentPane(clientPanel);
-        setTitle("Tic-Tac-Toe Client GUI");
-        setSize(640, 200);
-        setLocationRelativeTo(null);
-        setVisible(false);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-
-    }
-
-    public void startGame(String username, int rank) {
-        this.username.setText("#" + rank + " " + username);
-
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -132,6 +109,27 @@ public class ClientGui extends JFrame {
         });
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+    }
+
+    public static ClientGui getClientGUI(ClientService clientService) {
+        if (clientGui == null) {
+            clientGui = new ClientGui(clientService);
+        }
+        return clientGui;
+    }
+
+    private void initialiseGUI() {
+        setContentPane(clientPanel);
+        setTitle("Tic-Tac-Toe Client GUI");
+        setSize(640, 200);
+        setLocationRelativeTo(null);
+        setVisible(false);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+    }
+
+    public void startGame(String username, int rank) {
+        this.username.setText("#" + rank + " " + username);
 
     }
 
@@ -191,7 +189,7 @@ public class ClientGui extends JFrame {
     }
 
 
-    public void showResult(String result) {
+    public synchronized void showResult(String result) {
         JOptionPane.showMessageDialog(null, result, "result", JOptionPane.INFORMATION_MESSAGE);
 
     }
@@ -213,7 +211,6 @@ public class ClientGui extends JFrame {
                 jButtons.get(ind).setText(String.valueOf(board[i][j]));
             }
         }
-        System.out.println("set visible");
         setVisible(true);
         getStartGUI(clientService).setVisible(false);
         if (flag) {
@@ -223,7 +220,7 @@ public class ClientGui extends JFrame {
         }
     }
 
-    public void notify(String s) {
+    public synchronized void notify(String s) {
         JOptionPane.showMessageDialog(ClientGui.this, s);
     }
 }

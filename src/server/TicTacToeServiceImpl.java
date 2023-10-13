@@ -200,6 +200,13 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
             waitingPlayers.remove(clientService);
     }
 
+    @Override
+    public void updateTime(int time, String username) throws RemoteException {
+        TicTacToeGame game = getGameByPlayer(username);
+        if (game != null)
+            game.updateTime(time);
+    }
+
     private void checkStatus() {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         Runnable checkServerStatus = () -> {
@@ -211,7 +218,6 @@ public class TicTacToeServiceImpl extends UnicastRemoteObject implements TicTacT
                             e.getValue().pong();
                         } catch (RemoteException ex) {
                             TicTacToeGame game;
-                            //pause the game for 30 seconds
                             try {
                                 game = PlayerGames.getGameByPlayer(e.getKey());
                                 game.pause();

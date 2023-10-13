@@ -18,6 +18,7 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
     List<int[]> list = new LinkedList<>();
     private boolean gameFinished;
     private String currentPlayer;
+    private int time;
 
     public TicTacToeGame(String user1, String user2) throws RemoteException {
         this.user1 = user1;
@@ -148,13 +149,13 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
             ClientService player2 = PlayerGames.getClientByUsername(user2);
             try {
                 player1.pause();
-                player2.pause();
             } catch (RemoteException e) {
+                System.out.println(user1 + " lost connection");
             }
             try {
-                Thread.sleep(30000);
-            } catch (InterruptedException e) {
-                resume();
+                player2.pause();
+            } catch (RemoteException e) {
+                System.out.println(user2 + " lost connection");
             }
         }
 
@@ -165,8 +166,8 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
             ClientService player1 = PlayerGames.getClientByUsername(user1);
             ClientService player2 = PlayerGames.getClientByUsername(user2);
             try {
-                player1.resume(board, currentPlayer);
-                player2.resume(board, currentPlayer);
+                player1.resume(board, currentPlayer, time);
+                player2.resume(board, currentPlayer, time);
             } catch (RemoteException e) {
                 System.err.println("Unable to resume the client");
             }
@@ -174,5 +175,10 @@ public class TicTacToeGame implements Serializable, ITicTacToeGame {
 
 
     }
+
+    public void updateTime(int time) {
+        this.time = time;
+    }
+
 }
 

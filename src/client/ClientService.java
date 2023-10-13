@@ -49,5 +49,6 @@ public interface ClientService extends Remote {
 
     void pause() throws RemoteException;
 
-    void resume(char[][] board, String currentPlayer) throws RemoteException;
+    void resume(char[][] board, String currentPlayer, int time) throws RemoteException;
+
 }

@@ -19,7 +19,6 @@ public class ClientServiceImpl implements ClientService {
     Player currentPlayer;
     Counter counter;
     MessageBroker messageBroker;
-    int time;
 
     public ClientServiceImpl(TicTacToeService server, String username) throws RemoteException {
         super();
@@ -100,6 +99,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void sendTime(int time) throws RemoteException {
         getClientGUI(this).showTime(time);
+        server.updateTime(time, currentPlayer.getUsername());
     }
 
     @Override
@@ -145,21 +145,26 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void pause() {
-        counter.cancel();
+        counter.stop();
         getClientGUI(this).disableButton();
     }
 
     @Override
-    public void resume(char[][] board, String currentPlayer) throws RemoteException {
+    public void resume(char[][] board, String currentPlayer, int time) throws RemoteException {
         boolean flag = false;
         counter.setCurrentPlayer(this);
         if (currentPlayer.equals(this.currentPlayer.getUsername())) {
             flag = true;
+        }
+        getClientGUI(this).resume(board, flag);
+        if (flag) {
+            counter.setTime(time);
             counter.run();
         } else {
             counter.cancel();
         }
-        getClientGUI(this).resume(board, flag);
 
     }
+
+
 }

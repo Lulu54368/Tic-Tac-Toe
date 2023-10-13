@@ -64,9 +64,13 @@ public class Counter extends TimerTask implements Serializable {
         timer.scheduleAtFixedRate(timerTask, 0, 1000L);
     }
 
-    public boolean cancel() {
+    public boolean stop() {
         timer.cancel();
         return true;
     }
 
+
+    public void setTime(int time) {
+        this.time = time;
+    }
 }

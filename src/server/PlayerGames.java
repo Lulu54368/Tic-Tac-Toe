@@ -15,6 +15,8 @@ public class PlayerGames {
     private static final HashMap<String, ClientService> activePlayer = new HashMap<>();
 
     public static TicTacToeGame getGameByPlayer(String username) throws RemoteException {
+        if (playerGame.isEmpty() || playerGame == null)
+            return null;
         return playerGame.entrySet()
                 .stream()
                 .filter(e -> e.getValue().contains(username))
